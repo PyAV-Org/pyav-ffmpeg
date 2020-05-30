@@ -1,5 +1,5 @@
 set destdir=%1
-set ffmpeg_version=4.2.2
+set ffmpeg_version=4.2.3
 set ffmpeg_basename=ffmpeg-%ffmpeg_version%-win%PYTHON_ARCH%
 set outputdir=output
 

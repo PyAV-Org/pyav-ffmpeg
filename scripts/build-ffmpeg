@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
 fi
 
 destdir=$1
-ffmpeg_version=4.2.2
+ffmpeg_version=4.2.3
 
 builddir=`pwd`/build
 sourcedir=`pwd`/source
