@@ -303,6 +303,7 @@ EOF
         --enable-version3 \
         --enable-zlib
 
+    pkg-config --list-all
     if [ "`uname`" = "Darwin" ]; then
         otool -L $destdir/lib/*.dylib
     fi
