@@ -6,7 +6,6 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         include:
           - os: macos-latest
@@ -34,7 +33,7 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor
-          CIBW_BEFORE_BUILD_WINDOWS: scripts\build-ffmpeg.bat C:\cibw\vendor
+          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor
           CIBW_BUILD: cp38-*
           CIBW_ENVIRONMENT_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: python scripts/inject-dll.py {wheel} {dest_dir} C:\cibw\vendor\bin

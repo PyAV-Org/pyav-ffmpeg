@@ -89,7 +89,7 @@ class Package:
     source_url: str
     build_system: str = "autoconf"
     build_arguments: List[str] = field(default_factory=list)
-    build_dir: str = "build"
+    build_dir: str = ""
     build_parallel: bool = True
     requires: List[str] = field(default_factory=list)
     source_dir: str = ""
@@ -134,12 +134,12 @@ class Builder:
         os.makedirs(package_build_path, exist_ok=True)
         os.chdir(package_build_path)
         run(
-            [os.path.join(package_source_path, "configure")]
+            ["sh", os.path.join(package_source_path, "configure")]
             + [
                 "--disable-static",
                 "--enable-shared",
-                "--libdir=" + os.path.join(self.dest_dir, "lib"),
-                "--prefix=" + self.dest_dir,
+                "--libdir=" + self._mangle_path(os.path.join(self.dest_dir, "lib")),
+                "--prefix=" + self._mangle_path(self.dest_dir),
             ]
             + package.build_arguments
         )
@@ -151,7 +151,7 @@ class Builder:
         assert package.build_system == "cmake"
         package_path = os.path.join(self.build_dir, package.name)
         package_source_path = os.path.join(package_path, package.source_dir)
-        package_build_path = os.path.join(package_path, package.build_dir)
+        package_build_path = os.path.join(package_path, "build")
 
         # determine cmake arguments
         cmake_args = [
@@ -176,7 +176,7 @@ class Builder:
         assert package.build_system == "meson"
         package_path = os.path.join(self.build_dir, package.name)
         package_source_path = os.path.join(package_path, package.source_dir)
-        package_build_path = os.path.join(package_path, package.build_dir)
+        package_build_path = os.path.join(package_path, "build")
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)
@@ -212,3 +212,9 @@ class Builder:
         # apply patch
         if os.path.exists(patch):
             run(["patch", "-d", path, "-i", patch, "-p1"])
+
+    def _mangle_path(self, path: str) -> str:
+        if platform.system() == "Windows":
+            return path.replace("C:\\", "/c/").replace("D:\\", "/d/").replace("\\", "/")
+        else:
+            return path
