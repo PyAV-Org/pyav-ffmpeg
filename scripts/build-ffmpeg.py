@@ -45,6 +45,8 @@ if not os.path.exists(output_tarball):
                 ]
             )
         available_tools.update(["gperf"])
+    elif system == "Windows":
+        available_tools.update(["gperf", "nasm"])
 
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
@@ -88,7 +90,10 @@ if not os.path.exists(output_tarball):
             ],
         ),
         Package(
-            name="gmp", source_url="https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz"
+            name="gmp",
+            source_url="https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz",
+            # out-of-tree builds fail on Windows
+            build_dir=".",
         ),
         Package(
             name="png",
