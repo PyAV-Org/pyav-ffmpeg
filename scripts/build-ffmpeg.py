@@ -7,6 +7,7 @@ import struct
 import subprocess
 import sys
 import time
+from typing import List
 
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: build-ffmpeg.py <prefix>\n")
@@ -16,12 +17,6 @@ dest_dir = sys.argv[1]
 build_dir = os.path.abspath("build")
 patch_dir = os.path.abspath("patches")
 source_dir = os.path.abspath("source")
-
-
-# parallelize build, except when running in qemu
-make_args = []
-if platform.machine() != "aarch64":
-    make_args.append("-j")
 
 
 @contextlib.contextmanager
@@ -45,15 +40,43 @@ def log_group(title):
         sys.stdout.flush()
 
 
-def build(package, configure_args=[]):
-    path = os.path.join(build_dir, package)
-    os.chdir(path)
+def build(package, configure_args=[], parallel=True):
+    package_path = os.path.join(build_dir, package)
+
+    # build package
+    os.chdir(package_path)
     run(
         ["./configure"]
         + configure_args
         + ["--disable-static", "--enable-shared", "--prefix=" + dest_dir]
     )
-    run(["make"] + make_args)
+    run(["make"] + make_args(parallel=parallel))
+    run(["make", "install"])
+    os.chdir(build_dir)
+
+
+def build_with_cmake(package, cmake_args=[], source_dir="", parallel=True):
+    package_path = os.path.join(build_dir, package)
+    package_source_path = os.path.join(package_path, source_dir)
+    package_build_path = os.path.join(package_path, "build")
+
+    # determine cmake arguments
+    cmake_base_args = [
+        "-DBUILD_SHARED_LIBS=1",
+        "-DCMAKE_INSTALL_LIBDIR=lib",
+        "-DCMAKE_INSTALL_PREFIX=" + dest_dir,
+    ]
+    if platform.system() == "Darwin":
+        cmake_base_args.append(
+            "-DCMAKE_INSTALL_NAME_DIR=" + os.path.join(dest_dir, "lib")
+        )
+
+    # build package
+    if not os.path.exists(package_build_path):
+        os.mkdir(package_build_path)
+    os.chdir(package_build_path)
+    run(["cmake", package_source_path] + cmake_base_args + cmake_args)
+    run(["make"] + make_args(parallel=parallel))
     run(["make", "install"])
     os.chdir(build_dir)
 
@@ -76,6 +99,19 @@ def get_platform():
             return "win32"
     else:
         raise Exception(f"Unsupported system {system}")
+
+
+def make_args(*, parallel: bool) -> List[str]:
+    """
+    Arguments for GNU make.
+    """
+    args = []
+
+    # do not parallelize build when running in qemu
+    if parallel and platform.machine() != "aarch64":
+        args.append("-j")
+
+    return args
 
 
 def prepend_env(name, new, separator=" "):
@@ -110,17 +146,10 @@ def run(cmd):
     subprocess.run(cmd, check=True)
 
 
-cmake_args = [
-    "-DBUILD_SHARED_LIBS=1",
-    "-DCMAKE_INSTALL_LIBDIR=lib",
-    "-DCMAKE_INSTALL_PREFIX=" + dest_dir,
-]
 output_dir = os.path.abspath("output")
 system = platform.system()
 if system == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
     output_dir = "/output"
-elif system == "Darwin":
-    cmake_args.append("-DCMAKE_INSTALL_NAME_DIR=" + os.path.join(dest_dir, "lib"))
 output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
 
 for d in [build_dir, dest_dir]:
@@ -153,19 +182,20 @@ if not os.path.exists(output_tarball):
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
 
-    # install gperf
+    # build gperf if needed
     if "gperf" not in available_tools:
         with log_group("install gperf"):
             extract("gperf", "http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz")
             build("gperf")
 
-    # install nasm
-    with log_group("install nasm"):
-        extract(
-            "nasm",
-            "https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2",
-        )
-        build("nasm")
+    # build nasm if needed
+    if "nasm" not in available_tools:
+        with log_group("install nasm"):
+            extract(
+                "nasm",
+                "https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2",
+            )
+            build("nasm")
 
     #### LIBRARIES ###
 
@@ -260,21 +290,16 @@ if not os.path.exists(output_tarball):
             "https://aomedia.googlesource.com/aom/+archive/a6091ebb8a7da245373e56a005f2bb95be064e03.tar.gz",
             strip_components=0,
         )
-        os.mkdir(os.path.join("aom", "tmp"))
-        os.chdir(os.path.join("aom", "tmp"))
-        run(
-            ["cmake", ".."]
-            + cmake_args
-            + [
+        build_with_cmake(
+            "aom",
+            [
                 "-DENABLE_DOCS=0",
                 "-DENABLE_EXAMPLES=0",
                 "-DENABLE_TESTS=0",
                 "-DENABLE_TOOLS=0",
-            ]
+            ],
+            parallel=False,
         )
-        run(["make"])
-        run(["make", "install"])
-        os.chdir(build_dir)
 
     # build ass (requires freetype and fribidi)
     with log_group("ass"):
@@ -332,11 +357,7 @@ if not os.path.exists(output_tarball):
         extract(
             "openjpeg", "https://github.com/uclouvain/openjpeg/archive/v2.3.1.tar.gz"
         )
-        os.chdir("openjpeg")
-        run(["cmake", "."] + cmake_args)
-        run(["make"] + make_args)
-        run(["make", "install"])
-        os.chdir(build_dir)
+        build_with_cmake("openjpeg")
 
     # build opus
     with log_group("opus"):
@@ -386,11 +407,7 @@ if not os.path.exists(output_tarball):
     # build x265
     with log_group("x265"):
         extract("x265", "http://ftp.videolan.org/pub/videolan/x265/x265_3.2.1.tar.gz")
-        os.chdir("x265/build")
-        run(["cmake", "../source"] + cmake_args)
-        run(["make"] + make_args)
-        run(["make", "install"])
-        os.chdir(build_dir)
+        build_with_cmake("x265", source_dir="source")
 
     # build xvid
     with log_group("xvid"):
