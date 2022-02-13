@@ -12,12 +12,16 @@ if len(sys.argv) < 2:
     sys.stderr.write("Usage: build-ffmpeg.py <prefix>\n")
     sys.exit(1)
 
-ffmpeg_version = "4.3.2"
-
 dest_dir = sys.argv[1]
 build_dir = os.path.abspath("build")
 patch_dir = os.path.abspath("patches")
 source_dir = os.path.abspath("source")
+
+
+# parallelize build, except when running in qemu
+make_args = []
+if platform.machine() != "aarch64":
+    make_args.append("-j")
 
 
 @contextlib.contextmanager
@@ -49,7 +53,7 @@ def build(package, configure_args=[]):
         + configure_args
         + ["--disable-static", "--enable-shared", "--prefix=" + dest_dir]
     )
-    run(["make", "-j"])
+    run(["make"] + make_args)
     run(["make", "install"])
     os.chdir(build_dir)
 
@@ -137,9 +141,11 @@ if not os.path.exists(output_tarball):
     )
 
     # install packages
+    available_tools = set()
     if system == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         with log_group("install packages"):
-            run(["yum", "-y", "install", "libuuid-devel", "zlib-devel"])
+            run(["yum", "-y", "install", "gperf", "libuuid-devel", "zlib-devel"])
+        available_tools.update(["gperf"])
 
     #### BUILD TOOLS ####
 
@@ -148,9 +154,10 @@ if not os.path.exists(output_tarball):
         run(["pip", "install", "cmake", "meson", "ninja"])
 
     # install gperf
-    with log_group("install gperf"):
-        extract("gperf", "http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz")
-        build("gperf")
+    if "gperf" not in available_tools:
+        with log_group("install gperf"):
+            extract("gperf", "http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz")
+            build("gperf")
 
     # install nasm
     with log_group("install nasm"):
@@ -327,7 +334,7 @@ if not os.path.exists(output_tarball):
         )
         os.chdir("openjpeg")
         run(["cmake", "."] + cmake_args)
-        run(["make", "-j"])
+        run(["make"] + make_args)
         run(["make", "install"])
         os.chdir(build_dir)
 
@@ -381,7 +388,7 @@ if not os.path.exists(output_tarball):
         extract("x265", "http://ftp.videolan.org/pub/videolan/x265/x265_3.2.1.tar.gz")
         os.chdir("x265/build")
         run(["cmake", "../source"] + cmake_args)
-        run(["make", "-j"])
+        run(["make"] + make_args)
         run(["make", "install"])
         os.chdir(build_dir)
 
@@ -392,7 +399,7 @@ if not os.path.exists(output_tarball):
 
     # build ffmpeg
     with log_group("ffmpeg"):
-        extract("ffmpeg", f"https://ffmpeg.org/releases/ffmpeg-{ffmpeg_version}.tar.gz")
+        extract("ffmpeg", f"https://ffmpeg.org/releases/ffmpeg-4.3.2.tar.gz")
         build(
             "ffmpeg",
             [
