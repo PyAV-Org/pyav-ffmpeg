@@ -2,6 +2,7 @@ import glob
 import os
 import platform
 import sys
+import tarfile
 
 from cibuildpkg import Builder, Package, get_platform, log_group, prepend_env, run
 
