@@ -34,6 +34,10 @@ if not os.path.exists(output_tarball):
             run(["yum", "-y", "install", "gperf", "libuuid-devel", "zlib-devel"])
         available_tools.update(["gperf"])
 
+    if system == "Windows":
+        for cmd in ["bash", "sh", "make"]:
+            run(["where", cmd])
+
     #### BUILD TOOLS ####
 
     # install cmake, meson and ninja
@@ -330,4 +334,6 @@ if not os.path.exists(output_tarball):
         run(["otool", "-L"] + glob.glob(os.path.join(dest_dir, "lib", "*.dylib")))
 
     os.makedirs(output_dir, exist_ok=True)
-    run(["tar", "czvf", output_tarball, "-C", dest_dir, "include", "lib"])
+    with tarfile.open(output_tarball, "w") as tar:
+        for dirname in ["include", "lib"]:
+            tar.add(os.path.join(dest_dir, dirname), dirname)
