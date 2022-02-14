@@ -7,6 +7,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import tarfile
 import time
 from dataclasses import dataclass, field
 from typing import List
@@ -187,6 +188,7 @@ class Builder:
         os.chdir(self.build_dir)
 
     def _extract(self, package: Package) -> None:
+        assert package.source_strip_components in (0, 1)
         path = os.path.join(self.build_dir, package.name)
         patch = os.path.join(self.patch_dir, package.name + ".patch")
         tarball = os.path.join(self.source_dir, package.source_url.split("/")[-1])
@@ -196,18 +198,18 @@ class Builder:
             run(["curl", "-L", "-o", tarball, package.source_url])
 
         # extract tarball
-        os.mkdir(path)
-        run(
-            [
-                "tar",
-                "xf",
-                tarball,
-                "-C",
-                path,
-                "--strip-components",
-                str(package.source_strip_components),
-            ]
-        )
+        with tarfile.open(tarball) as tar:
+            if package.source_strip_components:
+                prefixes = set()
+                for name in tar.getnames():
+                    prefixes.add(name.split("/")[0])
+                assert len(prefixes) == 1, "more than one directory found in archive"
+                temp_path = os.path.join(self.build_dir, list(prefixes)[0])
+                shutil.unpack_archive(tarball, self.build_dir)
+                if temp_path != path:
+                    shutil.move(temp_path, path)
+            else:
+                shutil.unpack_archive(tarball, path)
 
         # apply patch
         if os.path.exists(patch):
