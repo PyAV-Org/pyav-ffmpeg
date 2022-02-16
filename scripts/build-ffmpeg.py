@@ -108,8 +108,13 @@ if not os.path.exists(output_tarball):
             build_arguments=["--disable-documentation"],
         ),
         Package(
+            name="tasn1",
+            source_url="http://ftp.gnu.org/gnu/libtasn1/libtasn1-4.18.0.tar.gz",
+            build_arguments=["--disable-doc"],
+        ),
+        Package(
             name="gnutls",
-            requires=["nettle", "unistring", "zlib"],
+            requires=["nettle", "tasn1", "unistring", "zlib"],
             source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.16.tar.xz",
             build_arguments=[
                 "--disable-cxx",
@@ -118,7 +123,6 @@ if not os.path.exists(output_tarball):
                 "--disable-nls",
                 "--disable-tests",
                 "--disable-tools",
-                "--with-included-libtasn1",
                 "--without-p11-kit",
             ],
         ),
