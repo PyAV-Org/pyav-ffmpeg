@@ -199,6 +199,15 @@ if not os.path.exists(output_tarball):
             build_arguments=["--disable-examples", "--disable-spec"],
         ),
         Package(
+            name="vpx",
+            source_url="https://github.com/webmproject/libvpx/archive/v1.11.0.tar.gz",
+            build_arguments=[
+                "--disable-examples",
+                "--disable-tools",
+                "--disable-unit-tests",
+            ],
+        ),
+        Package(
             name="wavpack", source_url="http://www.wavpack.com/wavpack-5.3.0.tar.bz2"
         ),
         Package(
@@ -238,6 +247,7 @@ if not os.path.exists(output_tarball):
                 "theora",
                 "twolame",
                 "vorbis",
+                "vpx",
                 "wavpack",
                 "x264",
                 "x265",
@@ -267,6 +277,7 @@ if not os.path.exists(output_tarball):
                 "--enable-libtheora",
                 "--enable-libtwolame",
                 "--enable-libvorbis",
+                "--enable-libvpx",
                 "--enable-libwavpack",
                 "--enable-libx264",
                 "--enable-libx265",
