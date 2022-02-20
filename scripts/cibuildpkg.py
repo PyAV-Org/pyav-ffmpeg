@@ -212,8 +212,12 @@ class Builder:
                 + package.build_arguments,
                 env=env,
             )
+            extra_args = ["V=1"]
+            if package.name == "vpx":
+                extra_args = ["verbose=1"]
             run(
-                ["make"] + make_args(parallel=package.build_parallel) + ["V=1"], env=env
+                ["make"] + make_args(parallel=package.build_parallel) + extra_args,
+                env=env,
             )
             run(["make", "install"], env=env)
 
