@@ -169,6 +169,8 @@ if not os.path.exists(output_tarball):
                 "--with-included-libtasn1",
                 "--without-p11-kit",
             ],
+            # parallel build fails on Windows
+            build_parallel=platform.system() != "Windows",
         ),
     ]
     package_groups[1] = [
