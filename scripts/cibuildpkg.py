@@ -333,11 +333,6 @@ endian = 'little'
         if os.path.exists(patch):
             run(["patch", "-d", path, "-i", patch, "-p1"])
 
-        # Config.guess script is old in "libtheora".
-        # Use system's config.guess script
-        if "libtheora" in tarball:
-            run(["cp", "/usr/local/share/libtool/build-aux/config.guess", path])
-
     def _environment(self, *, for_builder: bool) -> Dict[str, str]:
         env = os.environ.copy()
 
