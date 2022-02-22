@@ -27,7 +27,7 @@ if not os.path.exists(output_tarball):
     # install packages
 
     available_tools = set()
-    if system == "Linux" and os.environ.get("CIBUILDWHEEL") == "1" and not multistage_build:
+    if system == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         with log_group("install packages"):
             run(["yum", "-y", "install", "gperf", "libuuid-devel", "zlib-devel"])
         available_tools.update(["gperf"])
@@ -35,25 +35,25 @@ if not os.path.exists(output_tarball):
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
 
-    # build tools and it needs to be installed in first stage if building for AArch64
-    if not multistage_build or build_stage == 1:
-        if "gperf" not in available_tools:
-            builder.build(
-                Package(
-                    name="gperf",
-                    source_url="http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz",
-                ),
-                for_builder=True,
-            )
+    # build tools
 
-        if "nasm" not in available_tools:
-            builder.build(
-                Package(
-                    name="nasm",
-                    source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2",
-                ),
-                for_builder=True,
-            )
+    if "gperf" not in available_tools:
+        builder.build(
+            Package(
+                name="gperf",
+                source_url="http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz",
+            ),
+            for_builder=True,
+        )
+
+    if "nasm" not in available_tools:
+        builder.build(
+            Package(
+                name="nasm",
+                source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2",
+            ),
+            for_builder=True,
+        )
 
     # build packages
     package_groups = [0, 0, 0]

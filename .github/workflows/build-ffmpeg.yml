@@ -55,7 +55,7 @@ jobs:
     name: build (ubuntu-latest, aarch64) stage-1
     runs-on: ubuntu-latest
     env:
-      pybin: /opt/python/cp38-cp38/bin/
+      pybin: /opt/python/cp38-cp38/bin
       vendor: /tmp/vendor
       img: quay.io/pypa/manylinux2014_aarch64
       stage: 1
@@ -75,12 +75,10 @@ jobs:
         if: ${{ steps.libs-cache.outputs.cache-hit != 'true' }}
         run: |
           docker run -v $PWD:/project:rw --workdir=/project ${{ env.img }} bash -exc '
-            yum -y install gperf libuuid-devel zlib-devel;
             export PATH=${{ env.pybin }}:$PATH;
-            export LD_LIBRARY_PATH=${{ env.vendor }}/lib:$LD_LIBRARY_PATH;
             export CIBUILDWHEEL=1;
             python scripts/build-ffmpeg.py ${{ env.vendor }} ${{ env.stage }};
-            cp -r ${{ env.vendor }} /project;
+            cp -ar ${{ env.vendor }} /project;
           '
         shell: bash
       - uses: actions/upload-artifact@v2
@@ -92,7 +90,7 @@ jobs:
     needs: build-aarch64-stage-1
     runs-on: ubuntu-latest
     env:
-      pybin: /opt/python/cp38-cp38/bin/
+      pybin: /opt/python/cp38-cp38/bin
       vendor: /tmp/vendor
       img: quay.io/pypa/manylinux2014_aarch64
       stage: 2
@@ -116,14 +114,11 @@ jobs:
         if: ${{ steps.libs-cache.outputs.cache-hit != 'true' }}
         run: |
           docker run -v $PWD:/project:rw --workdir=/project ${{ env.img }} bash -exc '
-            yum -y install gperf libuuid-devel zlib-devel;
-            cp -rf vendor /tmp;
             export PATH=${{ env.pybin }}:$PATH;
-            export LD_LIBRARY_PATH=${{ env.vendor }}/lib:$LD_LIBRARY_PATH;
             export CIBUILDWHEEL=1;
-            find ${{ env.vendor }}/bin -type f -exec chmod 0777 {} \;
+            cp -ar vendor /tmp;
             python scripts/build-ffmpeg.py ${{ env.vendor }} ${{ env.stage }};
-            cp -rf ${{ env.vendor }} /project;
+            cp -ar ${{ env.vendor }} /project;
           '
         shell: bash
       - uses: actions/upload-artifact@v2
@@ -151,10 +146,10 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: aarch64
-          CIBW_BEFORE_ALL_LINUX: yum -y install gperf libuuid-devel zlib-devel && cp -r vendor /tmp/
+          CIBW_BEFORE_ALL_LINUX: cp -ar vendor /tmp
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py ${{ env.vendor }} ${{ env.stage }}
           CIBW_BUILD: cp38-*
-          CIBW_ENVIRONMENT_LINUX: LD_LIBRARY_PATH=${{ env.vendor }}/lib:$LD_LIBRARY_PATH
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
           CIBW_SKIP: "*musllinux*"
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
