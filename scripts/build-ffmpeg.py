@@ -31,6 +31,7 @@ if not os.path.exists(output_tarball):
     # install packages
 
     available_tools = set()
+    base_packages = []
     if system == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         with log_group("install packages"):
             run(
@@ -47,6 +48,13 @@ if not os.path.exists(output_tarball):
         available_tools.update(["gperf"])
     elif system == "Windows":
         available_tools.update(["gperf", "nasm"])
+        base_packages.append(
+            Package(
+                name="zlib",
+                source_url="http://zlib.net/zlib-1.2.12.tar.gz",
+                build_system="cmake",
+            )
+        )
 
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
@@ -72,8 +80,9 @@ if not os.path.exists(output_tarball):
         )
 
     # build packages
+
     package_groups = [[], [], []]
-    package_groups[0] = [
+    package_groups[0] = base_packages + [
         # libraries
         Package(
             name="xz",
