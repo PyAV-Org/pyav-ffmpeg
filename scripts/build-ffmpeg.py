@@ -238,11 +238,6 @@ if not os.path.exists(output_tarball):
             build_arguments=["--disable-binaries"],
         ),
         Package(
-            name="twolame",
-            source_url="http://deb.debian.org/debian/pool/main/t/twolame/twolame_0.4.0.orig.tar.gz",
-            build_arguments=["--disable-sndfile"],
-        ),
-        Package(
             name="vorbis",
             requires=["ogg"],
             source_url="http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz",
@@ -320,7 +315,6 @@ if not os.path.exists(output_tarball):
                 "--enable-libopus",
                 "--enable-libspeex",
                 "--enable-libtheora",
-                "--enable-libtwolame",
                 "--enable-libvorbis",
                 "--enable-libx264",
                 "--enable-libx265",
