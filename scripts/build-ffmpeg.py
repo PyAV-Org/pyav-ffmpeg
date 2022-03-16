@@ -1,6 +1,7 @@
 import glob
 import os
 import platform
+import shutil
 import sys
 
 from cibuildpkg import Builder, Package, get_platform, log_group, run
@@ -345,7 +346,23 @@ if not os.path.exists(output_tarball):
 
     if system == "Darwin":
         run(["otool", "-L"] + glob.glob(os.path.join(dest_dir, "lib", "*.dylib")))
+    elif system == "Windows":
+        # fix .lib files being installed in the wrong directory
+        for name in [
+            "avcodec",
+            "avdevice",
+            "avfilter",
+            "avformat",
+            "avutil",
+            "postproc",
+            "swresample",
+            "swscale",
+        ]:
+            shutil.move(
+                os.path.join(dest_dir, "bin", name + ".lib"),
+                os.path.join(dest_dir, "lib"),
+            )
 
     if build_stage is None or build_stage == 2:
         os.makedirs(output_dir, exist_ok=True)
-        run(["tar", "czvf", output_tarball, "-C", dest_dir, "include", "lib"])
+        run(["tar", "czvf", output_tarball, "-C", dest_dir, "bin", "include", "lib"])
