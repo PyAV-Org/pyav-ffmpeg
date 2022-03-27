@@ -52,6 +52,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: python scripts/inject-dll.py {wheel} {dest_dir} C:\cibw\vendor\bin
           CIBW_SKIP: "*musllinux*"
           CIBW_TEST_COMMAND: python -c "import dummy"
+          CIBW_TEST_SKIP: "*-win_amd64"
         run: |
           pip install cibuildwheel
           cibuildwheel --output-dir output
