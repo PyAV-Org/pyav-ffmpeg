@@ -48,14 +48,20 @@ if not os.path.exists(output_tarball):
             )
         available_tools.update(["gperf"])
     elif system == "Windows":
-        available_tools.update(["gperf", "nasm"])
-        base_packages.append(
-            Package(
-                name="zlib",
-                source_url="http://zlib.net/zlib-1.2.12.tar.gz",
-                build_system="cmake",
-            )
+        run(
+            [
+                "pacman",
+                "-S",
+                "--noconfirm",
+                "--needed",
+                "--noprogressbar",
+                "base-devel",
+                "mingw-w64-x86_64-libiconv",
+                "mingw-w64-x86_64-zlib",
+                "nasm",
+            ]
         )
+        available_tools.update(["gperf", "nasm"])
 
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
