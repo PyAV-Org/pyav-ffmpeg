@@ -81,7 +81,8 @@ if not os.path.exists(output_tarball):
             for_builder=True,
         )
 
-    # build packages
+    # define packages
+
     package_groups = [[], [], []]
     package_groups[0] = [
         # libraries
@@ -181,6 +182,15 @@ if not os.path.exists(output_tarball):
                 ],
             ),
         ]
+
+    if system == "Linux":
+        package_groups[0].append(
+            Package(
+                name="alsa-lib",
+                source_url="http://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2",
+                build_arguments=["--disable-python"],
+            )
+        )
 
     package_groups[1] = [
         # codecs
@@ -287,6 +297,7 @@ if not os.path.exists(output_tarball):
             build_dir="build/generic",
         ),
     ]
+
     package_groups[2] = [
         # ffmpeg
         Package(
@@ -316,10 +327,10 @@ if not os.path.exists(output_tarball):
             ],
             source_url="https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz",
             build_arguments=[
-                "--disable-alsa",
                 "--disable-doc",
                 "--disable-libtheora",
                 "--disable-mediafoundation",
+                "--enable-alsa" if platform.system() == "Linux" else "--disable-alsa",
                 "--enable-fontconfig",
                 "--enable-gmp",
                 "--enable-gnutls" if use_gnutls else "--disable-gnutls",
@@ -351,6 +362,8 @@ if not os.path.exists(output_tarball):
             ],
         ),
     ]
+
+    # build packages
 
     if build_stage is not None:
         packages = package_groups[build_stage]
