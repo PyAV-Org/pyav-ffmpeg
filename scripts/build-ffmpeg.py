@@ -244,7 +244,14 @@ codec_group = [
     ),
 ]
 
-nvheaders = Package(
+alsa_package = Package(
+    name="alsa-lib",
+    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
+    sha256="be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32",
+    build_arguments=["--disable-python"],
+)
+
+nvheaders_package = Package(
     name="nv-codec-headers",
     source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
     sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
@@ -301,8 +308,6 @@ def download_tars(packages: list[Package]) -> None:
 
 
 def main():
-    global library_group
-
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
     parser.add_argument("--community", action="store_true")
@@ -318,14 +323,17 @@ def main():
 
     dest_dir = args.destination
     community = args.community
-    enable_cuda = args.enable_cuda and plat in {"Linux", "Windows"}
-    del args
 
-    output_dir = os.path.abspath("output")
+    # Use CUDA if requested and supported.
+    use_cuda = args.enable_cuda and plat in {"Linux", "Windows"}
 
-    # FFmpeg has native TLS backends for macOS and Windows
+    # Use ALSA only on Linux.
+    use_alsa = plat == "Linux"
+
+    # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
 
+    output_dir = os.path.abspath("output")
     if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         output_dir = "/output"
     output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
@@ -370,7 +378,7 @@ def main():
         )
 
     ffmpeg_package.build_arguments = [
-        "--disable-alsa",
+        "--enable-alsa" if use_alsa else "--disable-alsa",
         "--disable-doc",
         "--disable-libtheora",
         "--disable-libfreetype",
@@ -404,7 +412,7 @@ def main():
         "--enable-version3",
     ]
 
-    if enable_cuda:
+    if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
     if community:
@@ -438,24 +446,22 @@ def main():
         ]
     )
 
+    packages = library_group[:]
+    if use_alsa:
+        packages += [alsa_package]
+    if use_cuda:
+        packages += [nvheaders_package]
     if use_gnutls:
-        library_group += gnutls_group
-    if enable_cuda:
-        library_group += [nvheaders]
-
-    package_groups = [library_group + codec_group, [ffmpeg_package]]
-    packages = [p for p_list in package_groups for p in p_list]
+        packages += gnutls_group
+    packages += codec_group
+    packages += [ffmpeg_package]
 
     filtered_packages = []
-
     for package in packages:
-        if package.when == When.never:
-            continue
         if package.when == When.community_only and not community:
             continue
         if package.when == When.commercial_only and community:
             continue
-
         filtered_packages.append(package)
 
     download_tars(build_tools + filtered_packages)
