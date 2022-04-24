@@ -1,6 +1,54 @@
+diff -urN openh264-2.2.0.orig/codec/common/meson.build openh264-2.2.0/codec/common/meson.build
+--- openh264-2.2.0.orig/codec/common/meson.build	2022-01-28 05:57:33.000000000 +0100
++++ openh264-2.2.0/codec/common/meson.build	2022-04-24 16:58:09.777345344 +0200
+@@ -58,8 +58,6 @@
+   else
+     cpp_sources += asm_sources
+   endif
+-else
+-  error('Unsupported cpu_family @0@'.format(cpu_family))
+ endif
+ 
+ libcommon = static_library('common', cpp_sources, objs_asm,
+diff -urN openh264-2.2.0.orig/codec/decoder/meson.build openh264-2.2.0/codec/decoder/meson.build
+--- openh264-2.2.0.orig/codec/decoder/meson.build	2022-01-28 05:57:33.000000000 +0100
++++ openh264-2.2.0/codec/decoder/meson.build	2022-04-24 16:58:09.777345344 +0200
+@@ -49,8 +49,6 @@
+   else
+     cpp_sources += asm_sources
+   endif
+-else
+-  error('Unsupported cpu family @0@'.format(cpu_family))
+ endif
+ 
+ libdecoder = static_library('decoder', cpp_sources, objs_asm,
+diff -urN openh264-2.2.0.orig/codec/encoder/meson.build openh264-2.2.0/codec/encoder/meson.build
+--- openh264-2.2.0.orig/codec/encoder/meson.build	2022-01-28 05:57:33.000000000 +0100
++++ openh264-2.2.0/codec/encoder/meson.build	2022-04-24 16:58:09.777345344 +0200
+@@ -74,8 +74,6 @@
+   else
+     cpp_sources += asm_sources
+   endif
+-else
+-  error('Unsupported cpu family @0@'.format(cpu_family))
+ endif
+ 
+ libencoder = static_library('encoder', cpp_sources, objs_asm,
+diff -urN openh264-2.2.0.orig/codec/processing/meson.build openh264-2.2.0/codec/processing/meson.build
+--- openh264-2.2.0.orig/codec/processing/meson.build	2022-01-28 05:57:33.000000000 +0100
++++ openh264-2.2.0/codec/processing/meson.build	2022-04-24 16:58:09.777345344 +0200
+@@ -50,8 +50,6 @@
+   else
+     cpp_sources += asm_sources
+   endif
+-else
+-  error('Unsupported cpu family @0@'.format(cpu_family))
+ endif
+ 
+ libprocessing = static_library('processing', cpp_sources, objs_asm,
 diff -urN openh264-2.2.0.orig/meson.build openh264-2.2.0/meson.build
 --- openh264-2.2.0.orig/meson.build	2022-01-28 05:57:33.000000000 +0100
-+++ openh264-2.2.0/meson.build	2022-04-23 17:24:13.761199844 +0200
++++ openh264-2.2.0/meson.build	2022-04-24 16:58:09.777345344 +0200
 @@ -54,10 +54,7 @@
  casm_inc = []
  cpp_lib = '-lstdc++'
@@ -13,7 +61,16 @@ diff -urN openh264-2.2.0.orig/meson.build openh264-2.2.0/meson.build
  deps += [libm_dep]
  
  if ['linux', 'android', 'ios', 'darwin'].contains(system)
-@@ -184,47 +181,24 @@
+@@ -89,8 +86,6 @@
+     add_project_arguments('-DHAVE_NEON_ARM64', language: 'c')
+     add_project_arguments('-DHAVE_NEON_ARM64', language: 'cpp')
+     casm_inc = include_directories(join_paths('codec', 'common', 'arm64'))
+-  else
+-    error('FIXME: unhandled CPU family @0@ for @1@'.format(cpu_family, system))
+   endif
+ 
+   if ['ios', 'darwin', 'android'].contains(system)
+@@ -184,47 +179,24 @@
  subdir ('codec')
  subdir ('test')
  
