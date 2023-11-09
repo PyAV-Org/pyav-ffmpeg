@@ -117,7 +117,7 @@ class Package:
     source_dir: str = ""
     source_filename: str = ""
     source_strip_components: int = 1
-    lgpl_compatible: bool = True  # Compatible with the LGPLv3 license
+    gpl: bool = False
 
 
 class Builder:

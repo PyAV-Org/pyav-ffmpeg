@@ -270,7 +270,7 @@ if not os.path.exists(output_tarball):
             source_url="https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2",
             # parallel build runs out of memory on Windows
             build_parallel=plat != "Windows",
-            lgpl_compatible=False,
+            gpl=True,
         ),
         Package(
             name="x265",
@@ -278,7 +278,7 @@ if not os.path.exists(output_tarball):
             source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
             build_system="cmake",
             source_dir="source",
-            lgpl_compatible=False,
+            gpl=True,
         ),
         Package(
             name="xvid",
@@ -286,7 +286,7 @@ if not os.path.exists(output_tarball):
             source_url="https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz",
             source_dir="build/generic",
             build_dir="build/generic",
-            lgpl_compatible=False,
+            gpl=True,
         ),
     ]
 
@@ -298,7 +298,7 @@ if not os.path.exists(output_tarball):
         build_system="meson",
     )
 
-    ff_build_args = [
+    ffmpeg_build_args = [
         "--disable-alsa",
         "--disable-doc",
         "--disable-libtheora",
@@ -320,20 +320,21 @@ if not os.path.exists(output_tarball):
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
-        "--enable-libopenh264" if disable_gpl else "--enable-libx264",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-libxml2",
         "--enable-lzma",
         "--enable-zlib",
+        "--enable-version3"
     ]
     if disable_gpl:
-        ff_build_args.append("--enable-version3")
+        ffmpeg_build_args.extend(["--enable-libopenh264", "--disable-libx264"])
     else:
-        ff_build_args.extend(
+        ffmpeg_build_args.extend(
             [
+                "--enable-libx264",
+                "--disable-libopenh264",
                 "--enable-libx265",
                 "--enable-libxvid",
-                "--enable-version3",
                 "--enable-gpl",
             ]
         )
@@ -341,7 +342,7 @@ if not os.path.exists(output_tarball):
     ffmpeg_package = Package(
         name="ffmpeg",
         source_url="https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz",
-        build_arguments=ff_build_args,
+        build_arguments=ffmpeg_build_args,
     )
 
     package_groups = [library_group, codec_group, [ffmpeg_package]]
@@ -351,7 +352,7 @@ if not os.path.exists(output_tarball):
         packages = [p for p_list in package_groups for p in p_list]
 
     for package in packages:
-        if disable_gpl and not package.lgpl_compatible:
+        if disable_gpl and package.gpl:
             if package.name == "x264":
                 builder.build(openh264)
             else:
