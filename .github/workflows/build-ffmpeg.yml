@@ -27,7 +27,7 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: 3.8
       - name: Install packages
@@ -58,109 +58,109 @@ jobs:
       - name: Upload FFmpeg
         uses: actions/upload-artifact@v3
         with:
-          name: output
+          name: output-wheel-${{ matrix.os }}-${{ matrix.arch }}
           path: output/
 
-  build-qemu-stage-1:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [aarch64, ppc64le]
-    env:
-      stage: 1
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Build FFmpeg dependencies
-        run: |
-          docker run -v $PWD:/project:rw --workdir=/project quay.io/pypa/manylinux2014_${{ matrix.arch }} bash -exc '
-            export PATH=/opt/python/cp38-cp38/bin:$PATH;
-            export CIBUILDWHEEL=1;
-            python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }};
-            cp -ar /tmp/vendor /project;
-          '
-        shell: bash
-      - uses: actions/upload-artifact@v3
-        with:
-          name: artifacts-${{ matrix.arch }}
-          path: vendor
+  # build-qemu-stage-1:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       arch: [aarch64, ppc64le]
+  #   env:
+  #     stage: 1
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.8
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+  #     - name: Build FFmpeg dependencies
+  #       run: |
+  #         docker run -v $PWD:/project:rw --workdir=/project quay.io/pypa/manylinux2014_${{ matrix.arch }} bash -exc '
+  #           export PATH=/opt/python/cp38-cp38/bin:$PATH;
+  #           export CIBUILDWHEEL=1;
+  #           python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }};
+  #           cp -ar /tmp/vendor /project;
+  #         '
+  #       shell: bash
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: artifacts-${{ matrix.arch }}
+  #         path: vendor
 
-  build-qemu-stage-2:
-    needs: build-qemu-stage-1
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [aarch64, ppc64le]
-    env:
-      stage: 2
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifacts-${{ matrix.arch }}
-          path: vendor
-      - name: Build FFmpeg dependencies
-        run: |
-          docker run -v $PWD:/project:rw --workdir=/project quay.io/pypa/manylinux2014_${{ matrix.arch }} bash -exc '
-            export PATH=/opt/python/cp38-cp38/bin:$PATH;
-            export CIBUILDWHEEL=1;
-            cp -ar vendor /tmp;
-            python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }};
-            cp -ar /tmp/vendor /project;
-          '
-        shell: bash
-      - uses: actions/upload-artifact@v3
-        with:
-          name: artifacts-${{ matrix.arch }}
-          path: vendor
+  # build-qemu-stage-2:
+  #   needs: build-qemu-stage-1
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       arch: [aarch64, ppc64le]
+  #   env:
+  #     stage: 2
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.8
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifacts-${{ matrix.arch }}
+  #         path: vendor
+  #     - name: Build FFmpeg dependencies
+  #       run: |
+  #         docker run -v $PWD:/project:rw --workdir=/project quay.io/pypa/manylinux2014_${{ matrix.arch }} bash -exc '
+  #           export PATH=/opt/python/cp38-cp38/bin:$PATH;
+  #           export CIBUILDWHEEL=1;
+  #           cp -ar vendor /tmp;
+  #           python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }};
+  #           cp -ar /tmp/vendor /project;
+  #         '
+  #       shell: bash
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: artifacts-${{ matrix.arch }}
+  #         path: vendor
 
-  build-qemu-stage-3:
-    needs: build-qemu-stage-2
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [aarch64, ppc64le]
-    env:
-      stage: 3
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifacts-${{ matrix.arch }}
-          path: vendor
-      - name: Build FFmpeg
-        env:
-          CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL_LINUX: cp -ar vendor /tmp
-          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }}
-          CIBW_BUILD: cp38-*
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
-          CIBW_SKIP: "*musllinux*"
-          CIBW_TEST_COMMAND: python -c "import dummy"
-        run: |
-          pip install cibuildwheel
-          cibuildwheel --output-dir output
-          rm -f output/*.whl
-        shell: bash
-      - name: Upload FFmpeg
-        uses: actions/upload-artifact@v3
-        with:
-          name: output
-          path: output/
+  # build-qemu-stage-3:
+  #   needs: build-qemu-stage-2
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       arch: [aarch64, ppc64le]
+  #   env:
+  #     stage: 3
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.8
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifacts-${{ matrix.arch }}
+  #         path: vendor
+  #     - name: Build FFmpeg
+  #       env:
+  #         CIBW_ARCHS: ${{ matrix.arch }}
+  #         CIBW_BEFORE_ALL_LINUX: cp -ar vendor /tmp
+  #         CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --stage ${{ env.stage }}
+  #         CIBW_BUILD: cp38-*
+  #         CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
+  #         CIBW_SKIP: "*musllinux*"
+  #         CIBW_TEST_COMMAND: python -c "import dummy"
+  #       run: |
+  #         pip install cibuildwheel
+  #         cibuildwheel --output-dir output
+  #         rm -f output/*.whl
+  #       shell: bash
+  #     - name: Upload FFmpeg
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: output
+  #         path: output/
