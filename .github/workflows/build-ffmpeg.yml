@@ -89,6 +89,7 @@ jobs:
         with:
           name: artifacts-${{ matrix.arch }}
           path: vendor
+          overwrite: true
 
   build-qemu-stage-2:
     needs: build-qemu-stage-1
@@ -124,6 +125,7 @@ jobs:
         with:
           name: artifacts-${{ matrix.arch }}
           path: vendor
+          overwrite: true
 
   build-qemu-stage-3:
     needs: build-qemu-stage-2
@@ -164,3 +166,4 @@ jobs:
         with:
           name: output
           path: output/
+          overwrite: true
