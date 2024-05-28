@@ -404,7 +404,7 @@ class Builder:
             env,
             "PKG_CONFIG_PATH",
             self._mangle_path(os.path.join(prefix, "lib", "pkgconfig")),
-            separator=os.pathsep,
+            separator=":",
         )
 
         if platform.system() == "Darwin" and not for_builder:
