@@ -318,8 +318,6 @@ if not os.path.exists(output_tarball):
         "--disable-alsa",
         "--disable-doc",
         "--disable-libtheora",
-        "--disable-mediafoundation",
-        "--disable-videotoolbox",
         "--enable-fontconfig",
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
