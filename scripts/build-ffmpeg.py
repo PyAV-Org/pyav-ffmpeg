@@ -38,9 +38,9 @@ library_group = [
     ),
     Package(
         name="xml2",
-        requires=["xz"],
-        source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
-        build_arguments=["--without-python"],
+        requires=["xz", "meson"],
+        source_url="https://github.com/GNOME/libxml2/archive/refs/tags/v2.9.13.tar.gz",
+        build_arguments=["--without-pyton"],
     ),
     Package(
         name="freetype",
