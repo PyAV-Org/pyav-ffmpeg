@@ -42,18 +42,6 @@ library_group = [
         source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
         build_arguments=["--without-python"],
     ),
-    Package(
-        name="freetype",
-        requires=["png"],
-        source_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.10.1.tar.gz",
-        build_arguments=["--with-harfbuzz=no"],
-    ),
-    Package(
-        name="fontconfig",
-        requires=["freetype", "xml2"],
-        source_url="https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.15.0.tar.xz",
-        build_arguments=["--disable-nls", "--enable-libxml2"],
-    ),
 ]
 
 gnutls_group = [
@@ -101,12 +89,6 @@ codec_group = [
             "-DENABLE_TOOLS=0",
         ],
         build_parallel=False,
-    ),
-    Package(
-        name="bluray",
-        requires=["fontconfig"],
-        source_url="https://download.videolan.org/pub/videolan/libbluray/1.3.4/libbluray-1.3.4.tar.bz2",
-        build_arguments=["--disable-bdjava-jar"],
     ),
     Package(
         name="dav1d",
@@ -209,7 +191,7 @@ openh264 = Package(
 
 ffmpeg_package = Package(
     name="ffmpeg",
-    source_url="https://ffmpeg.org/releases/ffmpeg-7.0.1.tar.xz",
+    source_url="https://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz",
     build_arguments=[],
 )
 
@@ -328,14 +310,13 @@ def main():
         "--disable-alsa",
         "--disable-doc",
         "--disable-libtheora",
+        "--disable-libfreetype",
+        "--disable-libfontconfig",
         "--enable-mediafoundation" if plat == "Windows" else "--disable-mediafoundation",
-        "--enable-fontconfig",
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libaom",
-        "--enable-libbluray",
         "--enable-libdav1d",
-        "--enable-libfreetype",
         "--enable-libmp3lame",
         "--enable-libopencore-amrnb",
         "--enable-libopencore-amrwb",
