@@ -312,6 +312,7 @@ def main():
         "--disable-libtheora",
         "--disable-libfreetype",
         "--disable-libfontconfig",
+        "--disable-libbluray",
         "--enable-mediafoundation" if plat == "Windows" else "--disable-mediafoundation",
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
