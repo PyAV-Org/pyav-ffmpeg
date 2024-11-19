@@ -214,12 +214,9 @@ class Builder:
         if package.name == "vpx":
             if platform.system() == "Darwin":
                 if platform.machine() == "arm64":
-                    # darwin20 is the first darwin that supports arm64 macs
                     configure_args += ["--target=arm64-darwin20-gcc"]
                 elif platform.machine() == "x86_64":
-                    # darwin13 matches the macos 10.9 target used by cibuildwheel:
-                    # https://cibuildwheel.readthedocs.io/en/stable/cpp_standards/#macos-and-deployment-target-versions
-                    configure_args += ["--target=x86_64-darwin13-gcc"]
+                    configure_args += ["--target=x86_64-darwin20-gcc"]
             elif platform.system() == "Windows":
                 configure_args += ["--target=x86_64-win64-gcc"]
 
