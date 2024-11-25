@@ -73,8 +73,8 @@ codec_group = [
     Package(
         name="aom",
         requires=["cmake"],
-        source_url="https://storage.googleapis.com/aom-releases/libaom-3.2.0.tar.gz",
-        source_strip_components=0,
+        source_url="https://storage.googleapis.com/aom-releases/libaom-3.11.0.tar.gz",
+        source_strip_components=1,
         build_system="cmake",
         build_arguments=[
             "-DENABLE_DOCS=0",
@@ -309,10 +309,14 @@ def main():
         "--disable-libfontconfig",
         "--disable-libbluray",
         "--disable-libopenjpeg",
-        "--enable-mediafoundation" if plat == "Windows" else "--disable-mediafoundation",
+        (
+            "--enable-mediafoundation"
+            if plat == "Windows"
+            else "--disable-mediafoundation"
+        ),
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
-        "--enable-libaom",
+        "--enable-libaom" if plat != "Windows" else "--disable-libaom",
         "--enable-libdav1d",
         "--enable-libmp3lame",
         "--enable-libopencore-amrnb",

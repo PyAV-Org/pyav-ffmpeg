@@ -50,13 +50,13 @@ jobs:
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         run: |
           brew update
-          brew install pkg-config
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxau libxcb libxdmcp little-cms2 unbound
       - uses: msys2/setup-msys2@v2
         if: matrix.os == 'windows-latest'
         with:
           install: base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-gperf mingw-w64-x86_64-nasm
           path-type: inherit
+          release: false
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
