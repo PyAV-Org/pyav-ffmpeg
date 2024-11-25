@@ -316,7 +316,7 @@ def main():
         ),
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
-        "--enable-libaom" if plat != "Windows" else "--disable-libaom",
+        "--enable-libaom",
         "--enable-libdav1d",
         "--enable-libmp3lame",
         "--enable-libopencore-amrnb",
