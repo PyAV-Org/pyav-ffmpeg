@@ -105,6 +105,29 @@ def run(cmd, env=None):
         print(f"stderr: {e.stderr}")
         raise e
 
+def print_config_logs():
+    """
+    Find and print ffbuild/config.log files.
+    Useful for debugging `ERROR: ... not found using pkg-config`
+    """
+    print(f"Begin print_config_log")
+    print(f"{os.getcwd()=}")
+    target_dir = "ffbuild"
+    target_file = "config.log"
+    if platform.system() == "Windows":
+        os_root = ["C:\\", "D:\\"]
+    else:
+        os_root = ["/"]
+    for drive in os_root:
+        for root, dirs, files in os.walk(drive):
+            if target_dir in dirs:
+                potential_dir = os.path.join(root, target_dir)
+                if target_file in os.listdir(potential_dir):
+                    full_path = os.path.join(potential_dir, target_file)
+                    print(f"Found ffbuild/config.log: {full_path}")
+                    with open(full_path, 'r') as log_file:
+                        print(log_file.read())
+    print(f"End print_config_log")
 
 @dataclass
 class Package:
@@ -222,20 +245,25 @@ class Builder:
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)
-        with chdir(package_build_path):
-            run(
-                [
-                    "sh",
-                    self._mangle_path(os.path.join(package_source_path, "configure")),
-                ]
-                + configure_args
-                + package.build_arguments,
-                env=env,
-            )
-            run(
-                ["make"] + make_args(parallel=package.build_parallel) + ["V=1"], env=env
-            )
-            run(["make", "install"], env=env)
+        try:
+            with chdir(package_build_path):
+                run(
+                    [
+                        "sh",
+                        self._mangle_path(os.path.join(package_source_path, "configure")),
+                    ]
+                    + configure_args
+                    + package.build_arguments,
+                    env=env,
+                )
+                run(
+                    ["make"] + make_args(parallel=package.build_parallel) + ["V=1"], env=env
+                )
+                run(["make", "install"], env=env)
+        except Exception as err:
+            print(err)
+            print(env)
+            print_config_logs()
 
     def _build_with_cmake(self, package: Package, for_builder: bool) -> None:
         assert package.build_system == "cmake"
