@@ -238,7 +238,14 @@ class Builder:
 
         if package.name == "ffmpeg" and platform.system() == "Windows":
             correct_configure(os.path.join(package_source_path, "configure"))
-
+            prepend_env(env, "LDFLAGS", "-LC:/PROGRA~1/OpenSSL/lib")
+            prepend_env(
+                env,
+                "PKG_CONFIG_PATH",
+                "/c/msys64/usr/lib/pkgconfig",
+                separator=":",
+            )
+        
         # build package
         os.makedirs(package_build_path, exist_ok=True)
         with chdir(package_build_path):
@@ -273,6 +280,9 @@ class Builder:
         ]
         if platform.system() == "Darwin":
             cmake_args.append("-DCMAKE_INSTALL_NAME_DIR=" + os.path.join(prefix, "lib"))
+
+        if package.name == "srt" and platform.system() == "Linux":
+            run(["yum", "-y", "install", "openssl-devel"])
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)

@@ -7,6 +7,7 @@ import subprocess
 
 from cibuildpkg import Builder, Package, fetch, get_platform, log_group, run
 
+
 plat = platform.system()
 
 library_group = [
@@ -172,6 +173,12 @@ codec_group = [
         source_dir="source",
         gpl=True,
     ),
+    Package(
+        name="srt",
+        source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
+        build_system="cmake",
+        build_arguments=[r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"] if plat == "Windows" else [""],
+    ),
 ]
 
 openh264 = Package(
@@ -323,6 +330,7 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libspeex",
+        "--enable-libsrt",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
