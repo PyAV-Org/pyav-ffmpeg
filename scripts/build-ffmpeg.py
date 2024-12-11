@@ -7,6 +7,7 @@ import subprocess
 
 from cibuildpkg import Builder, Package, fetch, get_platform, log_group, run
 
+
 plat = platform.system()
 
 library_group = [
@@ -73,8 +74,8 @@ codec_group = [
     Package(
         name="aom",
         requires=["cmake"],
-        source_url="https://storage.googleapis.com/aom-releases/libaom-3.2.0.tar.gz",
-        source_strip_components=0,
+        source_url="https://storage.googleapis.com/aom-releases/libaom-3.11.0.tar.gz",
+        source_strip_components=1,
         build_system="cmake",
         build_arguments=[
             "-DENABLE_DOCS=0",
@@ -171,6 +172,12 @@ codec_group = [
         build_system="cmake",
         source_dir="source",
         gpl=True,
+    ),
+    Package(
+        name="srt",
+        source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
+        build_system="cmake",
+        build_arguments=[r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"] if plat == "Windows" else [""],
     ),
 ]
 
@@ -309,7 +316,11 @@ def main():
         "--disable-libfontconfig",
         "--disable-libbluray",
         "--disable-libopenjpeg",
-        "--enable-mediafoundation" if plat == "Windows" else "--disable-mediafoundation",
+        (
+            "--enable-mediafoundation"
+            if plat == "Windows"
+            else "--disable-mediafoundation"
+        ),
         "--enable-gmp",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libaom",
@@ -319,6 +330,7 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libspeex",
+        "--enable-libsrt",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",

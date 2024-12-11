@@ -7,7 +7,7 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, i686, aarch64, ppc64le)
+- Linux (x86_64, i686, aarch64)
 - macOS (x86_64, arm64)
 - Windows (AMD64)
 
@@ -19,13 +19,14 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - gmp 6.3.0
 - xml2 2.9.13
 - xz 5.4.4
-- aom 3.2.0
+- aom 3.11.0
 - dav1d 1.4.1
 - lame 3.100
 - ogg 1.3.5
 - opencore-amr 0.1.5
 - opus 1.4
 - speex 1.2.1
+- srt 1.5.4
 - twolame 0.4.0
 - vorbis 1.3.7
 - vpx 1.14.0

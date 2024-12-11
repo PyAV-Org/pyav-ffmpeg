@@ -42,26 +42,30 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
-      - name: Set deployment target
-        if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
-      - name: Install packages
+          python-version: "3.13"
+      - name: Set deployment target for macOS 13
+        if: matrix.os == 'macos-13'
+        run: echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
+      - name: Set deployment target for macOS 14
+        if: matrix.os == 'macos-14'
+        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+      - name: Install packages for macOS
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         run: |
           brew update
-          brew install pkg-config
+          brew install srt
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxau libxcb libxdmcp little-cms2 unbound
       - uses: msys2/setup-msys2@v2
         if: matrix.os == 'windows-latest'
         with:
-          install: base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-gperf mingw-w64-x86_64-nasm
+          install: base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-gperf mingw-w64-x86_64-nasm openssl-devel
           path-type: inherit
+          release: false
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --disable-gpl
-          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --disable-gpl
+          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --enable-gpl
+          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --enable-gpl
           CIBW_BUILD: cp39-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
@@ -82,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [aarch64, ppc64le]
+        arch: [aarch64]
         os: [ubuntu-latest]
     env:
       stage: 1
@@ -90,7 +94,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.13"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Build FFmpeg dependencies
@@ -98,7 +102,7 @@ jobs:
           docker run -v $PWD:/project:rw --workdir=/project quay.io/pypa/manylinux2014_${{ matrix.arch }} bash -exc '
             export PATH=/opt/python/cp39-cp39/bin:$PATH;
             export CIBUILDWHEEL=1;
-            python scripts/build-ffmpeg.py /tmp/vendor --disable-gpl --stage ${{ env.stage }};
+            python scripts/build-ffmpeg.py /tmp/vendor --enable-gpl --stage ${{ env.stage }};
             cp -ar /tmp/vendor /project;
           '
         shell: bash
@@ -113,7 +117,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [aarch64, ppc64le]
+        arch: [aarch64]
         os: [ubuntu-latest]
     env:
       stage: 2
@@ -121,7 +125,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.13"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - uses: actions/download-artifact@v4
@@ -131,8 +135,10 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL_LINUX: cp -ar vendor /tmp
-          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --disable-gpl --stage ${{ env.stage }}
+          CIBW_BEFORE_ALL_LINUX: |
+            yum install -y openssl-devel
+            cp -ar vendor /tmp
+          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --enable-gpl --stage ${{ env.stage }}
           CIBW_BUILD: cp39-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
           CIBW_SKIP: "*musllinux*"
