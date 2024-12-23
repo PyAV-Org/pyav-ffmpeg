@@ -91,6 +91,11 @@ codec_group = [
         build_system="meson",
     ),
     Package(
+        name="libsvtav1",
+        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v2.2.1/SVT-AV1-v2.2.1.tar.gz",
+        build_system="cmake",
+    ),
+    Package(
         name="lame",
         source_url="http://deb.debian.org/debian/pool/main/l/lame/lame_3.100.orig.tar.gz",
     ),
@@ -323,6 +328,7 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libspeex",
+        "--enable-libsvtav1",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
