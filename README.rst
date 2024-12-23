@@ -26,6 +26,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - opencore-amr 0.1.5
 - opus 1.4
 - speex 1.2.1
+- svt-av1 2.2.1
 - twolame 0.4.0
 - vorbis 1.3.7
 - vpx 1.14.0
