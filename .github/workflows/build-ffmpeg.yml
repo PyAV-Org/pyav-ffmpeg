@@ -46,7 +46,7 @@ jobs:
       - name: Set deployment target
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         run: echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
-      - name: Install packages
+      - name: Install packages for macOS
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         run: |
           brew update
@@ -54,7 +54,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         if: matrix.os == 'windows-latest'
         with:
-          install: base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-gperf mingw-w64-x86_64-nasm
+          install: base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-gperf mingw-w64-x86_64-nasm openssl-devel
           path-type: inherit
           release: false
       - name: Build FFmpeg
@@ -131,7 +131,9 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL_LINUX: cp -ar vendor /tmp
+          CIBW_BEFORE_ALL_LINUX: |
+            yum install -y openssl-devel
+            cp -ar vendor /tmp
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --enable-gpl --stage ${{ env.stage }}
           CIBW_BUILD: cp39-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
