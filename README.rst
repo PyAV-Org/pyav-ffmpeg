@@ -30,7 +30,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - srt 1.5.4 (encryption disabled on macOS)
 - twolame 0.4.0
 - vorbis 1.3.7
-- vpx 1.15.0
+- vpx 1.14.0
 - png 1.6.37
 - webp 1.5.0
 - x264 master
