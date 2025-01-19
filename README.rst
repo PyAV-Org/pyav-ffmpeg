@@ -34,7 +34,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - png 1.6.37
 - webp 1.5.0
 - x264 master
-- x265 3.5
+- x265 4.1
 
 The following additional packages are also enabled on Linux:
 
