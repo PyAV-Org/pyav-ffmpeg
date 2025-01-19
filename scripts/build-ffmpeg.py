@@ -13,7 +13,7 @@ plat = platform.system()
 library_group = [
     Package(
         name="xz",
-        source_url="https://github.com/tukaani-project/xz/releases/download/v5.4.4/xz-5.4.4.tar.xz",
+        source_url="https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.xz",
         build_arguments=[
             "--disable-doc",
             "--disable-lzma-links",

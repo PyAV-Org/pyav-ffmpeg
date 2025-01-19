@@ -18,7 +18,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 
 - gmp 6.3.0
 - xml2 2.9.13
-- xz 5.4.4
+- xz 5.6.3
 - aom 3.11.0
 - dav1d 1.4.1
 - lame 3.100
