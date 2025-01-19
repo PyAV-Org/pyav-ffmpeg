@@ -24,7 +24,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - lame 3.100
 - ogg 1.3.5
 - opencore-amr 0.1.5
-- opus 1.4
+- opus 1.5.2
 - speex 1.2.1
 - svt-av1 2.2.1
 - srt 1.5.4 (encryption disabled on macOS)

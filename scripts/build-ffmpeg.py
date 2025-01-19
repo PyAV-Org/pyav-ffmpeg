@@ -105,14 +105,8 @@ codec_group = [
         source_url="http://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.gz",
     ),
     Package(
-        name="opencore-amr",
-        source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
-        # parallel build hangs on Windows
-        build_parallel=plat != "Windows",
-    ),
-    Package(
         name="opus",
-        source_url="https://github.com/xiph/opus/releases/download/v1.4/opus-1.4.tar.gz",
+        source_url="https://github.com/xiph/opus/releases/download/v1.5.2/opus-1.5.2.tar.gz",
         build_arguments=["--disable-doc", "--disable-extra-programs"],
     ),
     Package(
@@ -162,6 +156,12 @@ codec_group = [
             "-DWEBP_BUILD_WEBPMUX=OFF",
             "-DWEBP_BUILD_BUILD_EXTRAS=OFF",
         ],
+    ),
+    Package(
+        name="opencore-amr",
+        source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
+        # parallel build hangs on Windows
+        build_parallel=plat != "Windows",
     ),
     Package(
         name="x264",
