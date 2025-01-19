@@ -211,7 +211,7 @@ class Builder:
                 cache_path = os.path.join(self.source_dir, name)
                 if not os.path.exists(cache_path):
                     fetch(
-                        "https://git.savannah.gnu.org/cgit/config.git/plain/" + name,
+                        f"https://raw.githubusercontent.com/gcc-mirror/gcc/refs/heads/master/{name}",
                         cache_path,
                     )
                 shutil.copy(cache_path, script_path)
