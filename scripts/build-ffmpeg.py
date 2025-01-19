@@ -173,7 +173,7 @@ codec_group = [
     Package(
         name="x265",
         requires=["cmake"],
-        source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
+        source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz",
         build_system="cmake",
         source_dir="source",
         gpl=True,
