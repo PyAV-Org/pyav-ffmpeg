@@ -32,7 +32,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - vorbis 1.3.7
 - vpx 1.14.0
 - png 1.6.37
-- webp 1.4.0
+- webp 1.5.0
 - x264 master
 - x265 3.5
 
