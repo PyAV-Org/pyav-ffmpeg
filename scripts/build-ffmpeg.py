@@ -148,8 +148,8 @@ codec_group = [
     ),
     Package(
         name="webp",
-        source_filename="webp-1.4.0.tar.gz",
-        source_url="https://github.com/webmproject/libwebp/archive/refs/tags/v1.4.0.tar.gz",
+        source_filename="webp-1.5.0.tar.gz",
+        source_url="https://github.com/webmproject/libwebp/archive/refs/tags/v1.5.0.tar.gz",
         build_system="cmake",
         build_arguments=[
             "-DWEBP_BUILD_ANIM_UTILS=OFF",
