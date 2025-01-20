@@ -243,6 +243,8 @@ def main():
     # FFmpeg has native TLS backends for macOS and Windows
     use_gnutls = plat == "Linux"
 
+    if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
+        output_dir = "/output"
     output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
 
     if os.path.exists(output_tarball):
