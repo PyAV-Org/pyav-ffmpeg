@@ -31,7 +31,7 @@ Currently FFmpeg 7.1 is built with the following packages enabled for all platfo
 - twolame 0.4.0
 - vorbis 1.3.7
 - vpx 1.14.0
-- png 1.6.37
+- png 1.6.45
 - webp 1.5.0
 - x264 master
 - x265 3.5
