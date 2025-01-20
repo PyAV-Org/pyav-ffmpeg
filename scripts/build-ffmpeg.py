@@ -186,7 +186,7 @@ codec_group = [
             [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"] if plat == "Windows"
             else ["-DENABLE_ENCRYPTION=OFF"] if plat == "Darwin"
             else [""]
-            ),
+    ),
 ]
 
 openh264 = Package(
@@ -204,10 +204,29 @@ ffmpeg_package = Package(
 )
 
 
-def download_tars(use_gnutls):
-    # Try to download all tars at the start.
-    # If there is an curl error, do nothing, then try again in `main()`
+def get_output_dir():
+    if plat == "Linux":
+        return "/output"
+    else:
+        return os.path.abspath("output")
 
+
+def get_args():
+    parser = argparse.ArgumentParser("build-ffmpeg")
+    parser.add_argument("destination")
+    parser.add_argument("--enable-gpl", action="store_true")
+    parser.add_argument("--disable-gpl", action="store_true")
+
+    args = parser.parse_args()
+
+    return args.destination, args.disable_gpl
+
+
+def download_tars(use_gnutls):
+    """
+    Try to download all tars at the start.
+    If there is an curl error, do nothing, then try again in `main()`
+    """
     local_libs = library_group
     if use_gnutls:
         local_libs += gnutls_group
@@ -224,38 +243,7 @@ def download_tars(use_gnutls):
                 pass
 
 
-def main():
-    global library_group
-
-    parser = argparse.ArgumentParser("build-ffmpeg")
-    parser.add_argument("destination")
-    parser.add_argument("--enable-gpl", action="store_true")
-    parser.add_argument("--disable-gpl", action="store_true")
-
-    args = parser.parse_args()
-
-    dest_dir = args.destination
-    disable_gpl = args.disable_gpl
-    del args
-
-    output_dir = os.path.abspath("output")
-
-    # FFmpeg has native TLS backends for macOS and Windows
-    use_gnutls = plat == "Linux"
-
-    if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
-        output_dir = "/output"
-    output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
-
-    if os.path.exists(output_tarball):
-        return
-
-    builder = Builder(dest_dir=dest_dir)
-    builder.create_directories()
-
-    download_tars(use_gnutls)
-
-    # install packages
+def install_packages(builder):
     available_tools = set()
     if plat == "Windows":
         available_tools.update(["gperf", "nasm"])
@@ -264,9 +252,6 @@ def main():
         print("PATH", os.environ["PATH"])
         for tool in ["gcc", "g++", "curl", "gperf", "ld", "nasm", "pkg-config"]:
             run(["where", tool])
-
-    with log_group("install python packages"):
-        run(["pip", "install", "cmake", "meson", "ninja"])
 
     # build tools
     if "gperf" not in available_tools:
@@ -287,6 +272,13 @@ def main():
             for_builder=True,
         )
 
+
+def install_python_packages():
+    with log_group("install python packages"):
+        run(["pip", "install", "cmake", "meson", "ninja"])
+
+
+def set_ffmpeg_build_args(use_gnutls, disable_gpl):
     ffmpeg_package.build_arguments = [
         "--disable-alsa",
         "--disable-doc",
@@ -339,12 +331,17 @@ def main():
             ["--enable-videotoolbox", "--extra-ldflags=-Wl,-ld_classic"]
         )
 
+
+def get_packages(use_gnutls):
+    local_libs = library_group
     if use_gnutls:
-        library_group += gnutls_group
+        local_libs += gnutls_group
 
-    package_groups = [library_group + codec_group, [ffmpeg_package]]
-    packages = [p for p_list in package_groups for p in p_list]
+    package_groups = [local_libs + codec_group, [ffmpeg_package]]
+    return [p for p_list in package_groups for p in p_list]
 
+
+def build_packages(packages, disable_gpl, builder):
     for package in packages:
         if disable_gpl and package.gpl:
             if package.name == "x264":
@@ -354,58 +351,98 @@ def main():
         else:
             builder.build(package)
 
-    if plat == "Windows":
-        # fix .lib files being installed in the wrong directory
-        for name in (
-            "avcodec",
-            "avdevice",
-            "avfilter",
-            "avformat",
-            "avutil",
-            "postproc",
-            "swresample",
-            "swscale",
-        ):
-            if os.path.exists(os.path.join(dest_dir, "bin", name + ".lib")):
-                shutil.move(
-                    os.path.join(dest_dir, "bin", name + ".lib"),
-                    os.path.join(dest_dir, "lib"),
-                )
 
-        # copy some libraries provided by mingw
-        mingw_bindir = os.path.dirname(
-            subprocess.run(["where", "gcc"], check=True, stdout=subprocess.PIPE)
-            .stdout.decode()
-            .splitlines()[0]
-            .strip()
-        )
-        for name in (
-            "libgcc_s_seh-1.dll",
-            "libiconv-2.dll",
-            "libstdc++-6.dll",
-            "libwinpthread-1.dll",
-            "zlib1.dll",
-        ):
-            shutil.copy(os.path.join(mingw_bindir, name), os.path.join(dest_dir, "bin"))
+def move_windows_files(dest_dir):
+    if plat != "Windows":
+        return
 
-    # find libraries
+    # fix .lib files being installed in the wrong directory
+    for name in (
+        "avcodec",
+        "avdevice",
+        "avfilter",
+        "avformat",
+        "avutil",
+        "postproc",
+        "swresample",
+        "swscale",
+    ):
+        if os.path.exists(os.path.join(dest_dir, "bin", name + ".lib")):
+            shutil.move(
+                os.path.join(dest_dir, "bin", name + ".lib"),
+                os.path.join(dest_dir, "lib"),
+            )
+
+    # copy some libraries provided by mingw
+    mingw_bindir = os.path.dirname(
+        subprocess.run(["where", "gcc"], check=True, stdout=subprocess.PIPE)
+        .stdout.decode()
+        .splitlines()[0]
+        .strip()
+    )
+    for name in (
+        "libgcc_s_seh-1.dll",
+        "libiconv-2.dll",
+        "libstdc++-6.dll",
+        "libwinpthread-1.dll",
+        "zlib1.dll",
+    ):
+        shutil.copy(os.path.join(mingw_bindir, name), os.path.join(dest_dir, "bin"))
+
+
+def find_libraries(dest_dir):
     if plat == "Darwin":
-        libraries = glob.glob(os.path.join(dest_dir, "lib", "*.dylib"))
+        return glob.glob(os.path.join(dest_dir, "lib", "*.dylib"))
     elif plat == "Linux":
-        libraries = glob.glob(os.path.join(dest_dir, "lib", "*.so"))
+        return glob.glob(os.path.join(dest_dir, "lib", "*.so"))
     elif plat == "Windows":
-        libraries = glob.glob(os.path.join(dest_dir, "bin", "*.dll"))
+        return glob.glob(os.path.join(dest_dir, "bin", "*.dll"))
 
-    # strip libraries
+
+def strip_libraries(libraries):
     if plat == "Darwin":
         run(["strip", "-S"] + libraries)
         run(["otool", "-L"] + libraries)
     else:
         run(["strip", "-s"] + libraries)
 
-    # build output tarball
+
+def build_output_tarball(output_dir, output_tarball, dest_dir):
     os.makedirs(output_dir, exist_ok=True)
     run(["tar", "czvf", output_tarball, "-C", dest_dir, "bin", "include", "lib"])
+
+
+def main():
+    output_dir = get_output_dir()
+    
+    output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
+    if os.path.exists(output_tarball):
+        return
+
+    dest_dir, disable_gpl = get_args()
+
+    builder = Builder(dest_dir=dest_dir)
+    builder.create_directories()
+
+    # FFmpeg has native TLS backends for macOS and Windows
+    use_gnutls = plat == "Linux"
+
+    download_tars(use_gnutls)
+
+    install_packages(builder)
+    install_python_packages()
+
+    set_ffmpeg_build_args(use_gnutls, disable_gpl)
+
+    packages = get_packages(use_gnutls)
+    build_packages(packages, disable_gpl, builder)
+
+    move_windows_files(dest_dir)
+
+    libraries = find_libraries(dest_dir)
+    strip_libraries(libraries)
+
+    build_output_tarball(output_dir, output_tarball, dest_dir)
 
 
 if __name__ == "__main__":
