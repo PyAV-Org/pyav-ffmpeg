@@ -204,7 +204,7 @@ ffmpeg_package = Package(
 )
 
 
-def download_tars(use_gnutls, stage):
+def download_tars(use_gnutls):
     # Try to download all tars at the start.
     # If there is an curl error, do nothing, then try again in `main()`
 
@@ -212,16 +212,7 @@ def download_tars(use_gnutls, stage):
     if use_gnutls:
         local_libs += gnutls_group
 
-    if stage is None:
-        the_packages = local_libs + codec_group
-    elif stage == 0:
-        the_packages = local_libs
-    elif stage == 1:
-        the_packages = codec_group
-    else:
-        the_packages = []
-
-    for package in the_packages:
+    for package in local_libs + codec_group:
         tarball = os.path.join(
             os.path.abspath("source"),
             package.source_filename or package.source_url.split("/")[-1],
@@ -238,18 +229,12 @@ def main():
 
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
-    parser.add_argument(
-        "--stage",
-        default=None,
-        help="AArch64 build requires stage and possible values can be 1, 2",
-    )
     parser.add_argument("--enable-gpl", action="store_true")
     parser.add_argument("--disable-gpl", action="store_true")
 
     args = parser.parse_args()
 
     dest_dir = args.destination
-    build_stage = None if args.stage is None else int(args.stage) - 1
     disable_gpl = args.disable_gpl
     del args
 
@@ -258,8 +243,6 @@ def main():
     # FFmpeg has native TLS backends for macOS and Windows
     use_gnutls = plat == "Linux"
 
-    if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
-        output_dir = "/output"
     output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
 
     if os.path.exists(output_tarball):
@@ -268,25 +251,11 @@ def main():
     builder = Builder(dest_dir=dest_dir)
     builder.create_directories()
 
-    download_tars(use_gnutls, build_stage)
+    download_tars(use_gnutls)
 
     # install packages
     available_tools = set()
-    if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
-        with log_group("install packages"):
-            run(
-                [
-                    "yum",
-                    "-y",
-                    "install",
-                    "gperf",
-                    "libuuid-devel",
-                    "libxcb-devel",
-                    "zlib-devel",
-                ]
-            )
-        available_tools.update(["gperf"])
-    elif plat == "Windows":
+    if plat == "Windows":
         available_tools.update(["gperf", "nasm"])
 
         # print tool locations
@@ -372,10 +341,7 @@ def main():
         library_group += gnutls_group
 
     package_groups = [library_group + codec_group, [ffmpeg_package]]
-    if build_stage is not None:
-        packages = package_groups[build_stage]
-    else:
-        packages = [p for p_list in package_groups for p in p_list]
+    packages = [p for p_list in package_groups for p in p_list]
 
     for package in packages:
         if disable_gpl and package.gpl:
@@ -386,7 +352,7 @@ def main():
         else:
             builder.build(package)
 
-    if plat == "Windows" and (build_stage is None or build_stage == 1):
+    if plat == "Windows":
         # fix .lib files being installed in the wrong directory
         for name in (
             "avcodec",
@@ -436,9 +402,8 @@ def main():
         run(["strip", "-s"] + libraries)
 
     # build output tarball
-    if build_stage is None or build_stage == 1:
-        os.makedirs(output_dir, exist_ok=True)
-        run(["tar", "czvf", output_tarball, "-C", dest_dir, "bin", "include", "lib"])
+    os.makedirs(output_dir, exist_ok=True)
+    run(["tar", "czvf", output_tarball, "-C", dest_dir, "bin", "include", "lib"])
 
 
 if __name__ == "__main__":
