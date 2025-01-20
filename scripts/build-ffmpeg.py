@@ -136,7 +136,7 @@ codec_group = [
     ),
     Package(
         name="png",
-        source_url="http://deb.debian.org/debian/pool/main/libp/libpng1.6/libpng1.6_1.6.37.orig.tar.gz",
+        source_url="http://deb.debian.org/debian/pool/main/libp/libpng1.6/libpng1.6_1.6.45.orig.tar.gz",
         # avoid an assembler error on Windows
         build_arguments=["PNG_COPTS=-fno-asynchronous-unwind-tables"],
     ),
