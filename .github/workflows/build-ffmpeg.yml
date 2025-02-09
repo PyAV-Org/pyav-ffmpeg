@@ -48,7 +48,7 @@ jobs:
           python-version: "3.13"
       - name: Set deployment target
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+        run: echo "MACOSX_DEPLOYMENT_TARGET=12.0" >> $GITHUB_ENV
       - name: Install packages for macOS
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         run: |
