@@ -31,12 +31,12 @@ library_group = [
         # out-of-tree builds fail on Windows
         build_dir=".",
     ),
-    Package(
-        name="xml2",
-        requires=["xz"],
-        source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
-        build_arguments=["--without-python"],
-    ),
+    # Package(
+    #     name="xml2",
+    #     requires=["xz"],
+    #     source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
+    #     build_arguments=["--without-python"],
+    # ),
 ]
 
 gnutls_group = [
@@ -316,7 +316,7 @@ def main():
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
-        "--enable-libxml2",
+        # "--enable-libxml2",
         "--enable-lzma",
         "--enable-zlib",
         "--enable-version3",
