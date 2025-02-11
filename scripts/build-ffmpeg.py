@@ -31,12 +31,13 @@ library_group = [
         # out-of-tree builds fail on Windows
         build_dir=".",
     ),
-    # Package(
-    #     name="xml2",
-    #     requires=["xz"],
-    #     source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
-    #     build_arguments=["--without-python"],
-    # ),
+    Package(
+        name="xml2",
+        requires=["xz"],
+        source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
+        build_arguments=["--without-python"],
+        community=True,
+    )
 ]
 
 gnutls_group = [
@@ -162,13 +163,14 @@ codec_group = [
         source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
         # parallel build hangs on Windows
         build_parallel=plat != "Windows",
+        community=True,
     ),
     Package(
         name="x264",
         source_url="https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2",
         # parallel build runs out of memory on Windows
         build_parallel=plat != "Windows",
-        gpl=True,
+        community=True,
     ),
     Package(
         name="x265",
@@ -176,17 +178,19 @@ codec_group = [
         source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
         build_system="cmake",
         source_dir="source",
-        gpl=True,
+        community=True,
     ),
     Package(
         name="srt",
         source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
         build_system="cmake",
-        build_arguments =
-            [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"] if plat == "Windows"
-            else ["-DENABLE_ENCRYPTION=OFF"] if plat == "Darwin"
-            else [""]
-            ),
+        build_arguments=(
+            [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
+            if plat == "Windows"
+            else ["-DENABLE_ENCRYPTION=OFF"] if plat == "Darwin" else [""]
+        ),
+        community=True,
+    ),
 ]
 
 openh264 = Package(
@@ -201,6 +205,7 @@ ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz",
     build_arguments=[],
+    build_parallel= plat != "Windows",
 )
 
 
@@ -229,13 +234,16 @@ def main():
 
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
-    parser.add_argument("--enable-gpl", action="store_true")
-    parser.add_argument("--disable-gpl", action="store_true")
+    parser.add_argument("--community", action="store_true")
+    parser.add_argument("--commercial", action="store_true")
 
     args = parser.parse_args()
 
+    if args.community and args.commercial:
+        raise ValueError("mutually exclusive")
+
     dest_dir = args.destination
-    disable_gpl = args.disable_gpl
+    community = args.community
     del args
 
     output_dir = os.path.abspath("output")
@@ -305,23 +313,23 @@ def main():
         "--enable-libaom",
         "--enable-libdav1d",
         "--enable-libmp3lame",
-        "--enable-libopencore-amrnb",
-        "--enable-libopencore-amrwb",
+        "--enable-libopencore-amrnb" if community else "--disable-libopencore-amrnb",
+        "--enable-libopencore-amrwb" if community else "--disable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libspeex",
         "--enable-libsvtav1",
-        "--enable-libsrt",
+        "--enable-libsrt" if community else "--disable-libsrt",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
-        # "--enable-libxml2",
+        "--enable-libxml2" if community else "--disable-libxml2",
         "--enable-lzma",
         "--enable-zlib",
         "--enable-version3",
     ]
-    if disable_gpl:
+    if not community:
         ffmpeg_package.build_arguments.extend(
             ["--enable-libopenh264", "--disable-libx264"]
         )
@@ -346,7 +354,7 @@ def main():
     packages = [p for p_list in package_groups for p in p_list]
 
     for package in packages:
-        if disable_gpl and package.gpl:
+        if not community and package.community:
             if package.name == "x264":
                 builder.build(openh264)
             else:
