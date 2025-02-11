@@ -63,8 +63,8 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --enable-gpl
-          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --enable-gpl
+          CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --commercial
+          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --commercial
           CIBW_BUILD: cp39-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}

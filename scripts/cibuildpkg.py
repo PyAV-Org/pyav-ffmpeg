@@ -110,15 +110,15 @@ def correct_configure(file_path):
     """
     Edit ffmpeg's configure file. Properly quote `$pkg_version` in function `test_pkg_config()`.
     """
-    old_string = 'test_cmd $pkg_config --exists --print-errors $pkg_version || return'
+    old_string = "test_cmd $pkg_config --exists --print-errors $pkg_version || return"
     new_string = 'test_cmd $pkg_config --exists --print-errors "$pkg_version" || return'
-    
-    with open(file_path, 'r') as file:
+
+    with open(file_path, "r") as file:
         content = file.read()
-    
+
     updated_content = content.replace(old_string, new_string)
-    
-    with open(file_path, 'w') as file:
+
+    with open(file_path, "w") as file:
         file.write(updated_content)
 
 
@@ -134,7 +134,7 @@ class Package:
     source_dir: str = ""
     source_filename: str = ""
     source_strip_components: int = 1
-    gpl: bool = False
+    community: bool = False  # community only
 
     def __lt__(self, other):
         return self.name < other.name
@@ -245,7 +245,7 @@ class Builder:
                 "/c/msys64/usr/lib/pkgconfig",
                 separator=":",
             )
-        
+
         # build package
         os.makedirs(package_build_path, exist_ok=True)
         with chdir(package_build_path):
