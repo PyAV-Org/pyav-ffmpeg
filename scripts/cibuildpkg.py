@@ -82,8 +82,7 @@ def make_args(*, parallel: bool) -> list[str]:
     """
     args = []
 
-    # do not parallelize build when running in qemu
-    if parallel and platform.machine() not in ("aarch64", "ppc64le", "s390x"):
+    if parallel:
         args.append("-j")
 
     return args
