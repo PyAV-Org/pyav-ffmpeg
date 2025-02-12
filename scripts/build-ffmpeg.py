@@ -37,7 +37,7 @@ library_group = [
         source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
         build_arguments=["--without-python"],
         community=True,
-    )
+    ),
 ]
 
 gnutls_group = [
@@ -187,7 +187,9 @@ codec_group = [
         build_arguments=(
             [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
             if plat == "Windows"
-            else ["-DENABLE_ENCRYPTION=OFF"] if plat == "Darwin" else [""]
+            else ["-DENABLE_ENCRYPTION=OFF"]
+            if plat == "Darwin"
+            else [""]
         ),
         community=True,
     ),
@@ -201,15 +203,21 @@ openh264 = Package(
     build_system="meson",
 )
 
+nvheaders = Package(
+    name="nv-codec-headers",
+    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
+    build_system="make",
+)
+
 ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz",
     build_arguments=[],
-    build_parallel= plat != "Windows",
+    build_parallel=plat != "Windows",
 )
 
 
-def download_tars(use_gnutls):
+def download_tars(use_gnutls: bool, community: bool) -> None:
     # Try to download all tars at the start.
     # If there is an curl error, do nothing, then try again in `main()`
 
@@ -218,6 +226,8 @@ def download_tars(use_gnutls):
         local_libs += gnutls_group
 
     for package in local_libs + codec_group:
+        if not community and package.community:
+            continue
         tarball = os.path.join(
             os.path.abspath("source"),
             package.source_filename or package.source_url.split("/")[-1],
@@ -236,6 +246,9 @@ def main():
     parser.add_argument("destination")
     parser.add_argument("--community", action="store_true")
     parser.add_argument("--commercial", action="store_true")
+    parser.add_argument(
+        "--enable-cuda", action="store_true", help="Enable NVIDIA CUDA support"
+    )
 
     args = parser.parse_args()
 
@@ -244,6 +257,7 @@ def main():
 
     dest_dir = args.destination
     community = args.community
+    enable_cuda = args.enable_cuda and plat == "Linux"
     del args
 
     output_dir = os.path.abspath("output")
@@ -261,7 +275,7 @@ def main():
     builder = Builder(dest_dir=dest_dir)
     builder.create_directories()
 
-    download_tars(use_gnutls)
+    download_tars(use_gnutls, community)
 
     # install packages
     available_tools = set()
@@ -329,6 +343,12 @@ def main():
         "--enable-zlib",
         "--enable-version3",
     ]
+
+    if enable_cuda:
+        ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
+        # NVIDIA codecs require nonfree
+        ffmpeg_package.build_arguments.append("--enable-nonfree")
+
     if not community:
         ffmpeg_package.build_arguments.extend(
             ["--enable-libopenh264", "--disable-libx264"]
@@ -349,6 +369,8 @@ def main():
 
     if use_gnutls:
         library_group += gnutls_group
+    if enable_cuda:
+        library_group += [nvheaders]
 
     package_groups = [library_group + codec_group, [ffmpeg_package]]
     packages = [p for p_list in package_groups for p in p_list]

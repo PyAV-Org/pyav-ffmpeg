@@ -165,6 +165,8 @@ class Builder:
                 self._build_with_cmake(package, for_builder=for_builder)
             elif package.build_system == "meson":
                 self._build_with_meson(package, for_builder=for_builder)
+            elif package.build_system == "make":
+                self._build_with_make(package, for_builder=for_builder)
             else:
                 self._build_with_autoconf(package, for_builder=for_builder)
 
@@ -195,6 +197,33 @@ class Builder:
             os.path.join(self._builder_dest_dir, "bin"),
             separator=os.pathsep,
         )
+
+    def _build_with_make(self, package: Package, for_builder: bool) -> None:
+        assert package.build_system == "make"
+        package_path = os.path.join(self.build_dir, package.name)
+        package_source_path = os.path.join(package_path, package.source_dir)
+
+        # Get environment and prefix
+        env = self._environment(for_builder=for_builder)
+        prefix = self._prefix(for_builder=for_builder)
+
+        # Build package
+        with chdir(package_source_path):
+            make_command = ["make"] + make_args(parallel=package.build_parallel)
+            install_command = ["make", "install"]
+
+            # Add PREFIX to both make and install commands
+            prefix_arg = f"PREFIX={self._mangle_path(prefix)}"
+            make_command.append(prefix_arg)
+            install_command.append(prefix_arg)
+
+            # Add any additional build arguments
+            make_command.extend(package.build_arguments)
+            install_command.extend(package.build_arguments)
+
+            # Run build and install
+            run(make_command, env=env)
+            run(install_command, env=env)
 
     def _build_with_autoconf(self, package: Package, for_builder: bool) -> None:
         assert package.build_system == "autoconf"
@@ -405,9 +434,9 @@ class Builder:
                 prefixes = set()
                 for name in tar.getnames():
                     prefixes.add(name.split("/")[0])
-                assert (
-                    len(prefixes) == 1
-                ), "cannot strip path components, multiple prefixes found"
+                assert len(prefixes) == 1, (
+                    "cannot strip path components, multiple prefixes found"
+                )
                 prefix = list(prefixes)[0]
             else:
                 prefix = ""
