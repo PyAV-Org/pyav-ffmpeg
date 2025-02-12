@@ -26,10 +26,10 @@ jobs:
           - os: macos-13
             arch: x86_64
             shell: bash
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             arch: i686
             shell: bash
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             arch: x86_64
             shell: bash
           - os: windows-latest
@@ -64,7 +64,7 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --commercial --enable-cuda
-          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --commercial
+          CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --commercial --enable-cuda
           CIBW_BUILD: cp39-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}

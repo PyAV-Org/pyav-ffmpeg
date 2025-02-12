@@ -257,7 +257,7 @@ def main():
 
     dest_dir = args.destination
     community = args.community
-    enable_cuda = args.enable_cuda and plat == "Linux"
+    enable_cuda = args.enable_cuda and plat in {"Linux", "Windows"}
     del args
 
     output_dir = os.path.abspath("output")
