@@ -53,7 +53,7 @@ def main():
         elif not package.gpl or allow_gpl:
             print(f"- {package.name} {get_version(package)}")
 
-    print(f"\nThe following additional packages are also enabled on Linux:\n")
+    print("\nThe following additional packages are also enabled on Linux:\n")
     for package in sorted(gnutls_group):
         print(f"- {package.name} {get_version(package)}")
     print()
