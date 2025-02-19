@@ -5,8 +5,7 @@ import platform
 import shutil
 import subprocess
 
-from cibuildpkg import Builder, Package, fetch, get_platform, log_group, run
-
+from cibuildpkg import Builder, Package, When, fetch, get_platform, log_group, run
 
 plat = platform.system()
 
@@ -36,7 +35,7 @@ library_group = [
         requires=["xz"],
         source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
         build_arguments=["--without-python"],
-        community=True,
+        when=When.community_only,
     ),
 ]
 
@@ -159,18 +158,32 @@ codec_group = [
         ],
     ),
     Package(
+        name="openh264",
+        requires=["meson", "nasm", "ninja"],
+        source_filename="openh264-2.5.0.tar.gz",
+        source_url="https://github.com/cisco/openh264/archive/refs/tags/v2.5.0.tar.gz",
+        build_system="meson",
+        when=When.commercial_only,
+    ),
+    Package(
+        name="fdk_aac",
+        source_url="https://github.com/mstorsjo/fdk-aac/archive/refs/tags/v2.0.3.tar.gz",
+        when=When.commercial_only,
+        build_system="cmake",
+    ),
+    Package(
         name="opencore-amr",
         source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
         # parallel build hangs on Windows
         build_parallel=plat != "Windows",
-        community=True,
+        when=When.community_only,
     ),
     Package(
         name="x264",
         source_url="https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2",
         # parallel build runs out of memory on Windows
         build_parallel=plat != "Windows",
-        community=True,
+        when=When.community_only,
     ),
     Package(
         name="x265",
@@ -178,7 +191,7 @@ codec_group = [
         source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
         build_system="cmake",
         source_dir="source",
-        community=True,
+        when=When.community_only,
     ),
     Package(
         name="srt",
@@ -191,17 +204,9 @@ codec_group = [
             if plat == "Darwin"
             else [""]
         ),
-        community=True,
+        when=When.community_only,
     ),
 ]
-
-openh264 = Package(
-    name="openh264",
-    requires=["meson", "nasm", "ninja"],
-    source_filename="openh264-2.5.0.tar.gz",
-    source_url="https://github.com/cisco/openh264/archive/refs/tags/v2.5.0.tar.gz",
-    build_system="meson",
-)
 
 nvheaders = Package(
     name="nv-codec-headers",
@@ -226,8 +231,13 @@ def download_tars(use_gnutls: bool, community: bool) -> None:
         local_libs += gnutls_group
 
     for package in local_libs + codec_group:
-        if not community and package.community:
+        if package.when == When.never:
             continue
+        if package.when == When.community_only and not community:
+            continue
+        if package.when == When.commercial_only and community:
+            continue
+
         tarball = os.path.join(
             os.path.abspath("source"),
             package.source_filename or package.source_url.split("/")[-1],
@@ -346,14 +356,8 @@ def main():
 
     if enable_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
-        # NVIDIA codecs require nonfree
-        ffmpeg_package.build_arguments.append("--enable-nonfree")
 
-    if not community:
-        ffmpeg_package.build_arguments.extend(
-            ["--enable-libopenh264", "--disable-libx264"]
-        )
-    else:
+    if community:
         ffmpeg_package.build_arguments.extend(
             [
                 "--enable-libx264",
@@ -362,6 +366,11 @@ def main():
                 "--enable-gpl",
             ]
         )
+    else:
+        ffmpeg_package.build_arguments.extend(
+            ["--enable-libopenh264", "--disable-libx264", "--enable-libfdk_aac"]
+        )
+
     if plat == "Darwin":
         ffmpeg_package.build_arguments.extend(
             ["--enable-videotoolbox", "--extra-ldflags=-Wl,-ld_classic"]
@@ -376,13 +385,14 @@ def main():
     packages = [p for p_list in package_groups for p in p_list]
 
     for package in packages:
-        if not community and package.community:
-            if package.name == "x264":
-                builder.build(openh264)
-            else:
-                pass
-        else:
-            builder.build(package)
+        if package.when == When.never:
+            continue
+        if package.when == When.community_only and not community:
+            continue
+        if package.when == When.commercial_only and community:
+            continue
+
+        builder.build(package)
 
     if plat == "Windows":
         # fix .lib files being installed in the wrong directory

@@ -1,7 +1,5 @@
 # Utilities for building native library inside cibuildwheel
 
-from __future__ import annotations
-
 import contextlib
 import os
 import platform
@@ -12,6 +10,7 @@ import sys
 import tarfile
 import tempfile
 import time
+from enum import IntEnum
 from dataclasses import dataclass, field, replace
 
 
@@ -105,7 +104,7 @@ def run(cmd, env=None):
         raise e
 
 
-def correct_configure(file_path):
+def correct_configure(file_path: str) -> None:
     """
     Edit ffmpeg's configure file. Properly quote `$pkg_version` in function `test_pkg_config()`.
     """
@@ -121,6 +120,13 @@ def correct_configure(file_path):
         file.write(updated_content)
 
 
+class When(IntEnum):
+    never = 0
+    community_only = 1
+    commercial_only = 2
+    always = 3
+
+
 @dataclass
 class Package:
     name: str
@@ -133,7 +139,7 @@ class Package:
     source_dir: str = ""
     source_filename: str = ""
     source_strip_components: int = 1
-    community: bool = False  # community only
+    when: When = When.always
 
     def __lt__(self, other):
         return self.name < other.name
