@@ -6,12 +6,12 @@ import platform
 import shutil
 import struct
 import subprocess
-import sys
 import tarfile
 import tempfile
 import time
-from enum import IntEnum
+from collections.abc import Iterator
 from dataclasses import dataclass, field, replace
+from enum import IntEnum
 
 
 def fetch(url: str, path: str) -> None:
@@ -38,7 +38,7 @@ def get_platform() -> str:
 
 
 @contextlib.contextmanager
-def chdir(path):
+def chdir(path: str) -> Iterator[None]:
     """
     Changes to a directory and returns to the original directory at exit.
     """
@@ -51,28 +51,22 @@ def chdir(path):
 
 
 @contextlib.contextmanager
-def log_group(title):
+def log_group(title: str) -> Iterator[None]:
     """
     Starts a log group and ends it at exit.
     """
     start_time = time.time()
     success = False
-    log_print(f"::group::{title}")
+    print(f"::group::{title}", flush=True)
     try:
         yield
         success = True
     finally:
         duration = time.time() - start_time
         outcome = "ok" if success else "failed"
-        start_color = "\033[32m" if success else "\033[31m"
-        end_color = "\033[0m"
-        log_print("::endgroup::")
-        log_print(f"{start_color}{outcome}{end_color} {duration:.2f}s".rjust(78))
-
-
-def log_print(msg: str) -> None:
-    sys.stdout.write(msg + "\n")
-    sys.stdout.flush()
+        start_color = "[32m" if success else "[31m"
+        ok_str = f"\033{start_color}{outcome}\033[0m {duration:.2f}s".rjust(78)
+        print(f"::endgroup::\n{ok_str}", flush=True)
 
 
 def make_args(*, parallel: bool) -> list[str]:
@@ -87,7 +81,7 @@ def make_args(*, parallel: bool) -> list[str]:
     return args
 
 
-def prepend_env(env, name, new, separator=" "):
+def prepend_env(env, name: str, new: str, separator: str = " ") -> None:
     old = env.get(name)
     if old:
         env[name] = new + separator + old
@@ -95,8 +89,8 @@ def prepend_env(env, name, new, separator=" "):
         env[name] = new
 
 
-def run(cmd, env=None):
-    log_print(f"- Running: {cmd}")
+def run(cmd: list[str], env=None) -> None:
+    print(f"- Running: {cmd}", flush=True)
     try:
         subprocess.run(cmd, check=True, env=env, stderr=subprocess.PIPE, text=True)
     except subprocess.CalledProcessError as e:
@@ -111,7 +105,7 @@ def correct_configure(file_path: str) -> None:
     old_string = "test_cmd $pkg_config --exists --print-errors $pkg_version || return"
     new_string = 'test_cmd $pkg_config --exists --print-errors "$pkg_version" || return'
 
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         content = file.read()
 
     updated_content = content.replace(old_string, new_string)
@@ -127,7 +121,7 @@ class When(IntEnum):
     always = 3
 
 
-@dataclass
+@dataclass(slots=True)
 class Package:
     name: str
     source_url: str
@@ -184,9 +178,9 @@ class Builder:
     def create_directories(self) -> None:
         # print debugging information
         if platform.system() == "Darwin":
-            log_print("Environment variables")
+            print("Environment variables")
             for var in ("ARCHFLAGS", "MACOSX_DEPLOYMENT_TARGET"):
-                log_print(f" - {var}: {os.environ[var]}")
+                print(f" - {var}: {os.environ[var]}")
 
         # delete build directory
         if os.path.exists(self.build_dir):
