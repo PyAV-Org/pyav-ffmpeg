@@ -35,7 +35,6 @@ library_group = [
         requires=["xz"],
         source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
         build_arguments=["--without-python"],
-        when=When.community_only,
     ),
 ]
 
@@ -322,6 +321,9 @@ def main():
     ffmpeg_package.build_arguments = [
         "--disable-alsa",
         "--disable-doc",
+        # Disable experimental codecs
+        "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd,vorbis",
+        "--disable-decoder=sonic",
         "--disable-libtheora",
         "--disable-libfreetype",
         "--disable-libfontconfig",
@@ -348,7 +350,7 @@ def main():
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
-        "--enable-libxml2" if community else "--disable-libxml2",
+        "--enable-libxml2",
         "--enable-lzma",
         "--enable-zlib",
         "--enable-version3",
