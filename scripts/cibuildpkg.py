@@ -25,7 +25,10 @@ def get_platform() -> str:
     system = platform.system()
     machine = platform.machine()
     if system == "Linux":
-        return f"manylinux_{machine}"
+        if platform.libc_ver()[0] == "glibc":
+            return f"manylinux_{machine}"
+        else:
+            return f"musllinux_{machine}"
     elif system == "Darwin":
         return f"macosx_{machine}"
     elif system == "Windows":
@@ -310,7 +313,10 @@ class Builder:
             cmake_args.append("-DCMAKE_INSTALL_NAME_DIR=" + os.path.join(prefix, "lib"))
 
         if package.name == "srt" and platform.system() == "Linux":
-            run(["yum", "-y", "install", "openssl-devel"])
+            if platform.libc_ver()[0] == "glibc":
+                run(["yum", "-y", "install", "openssl-devel"])
+            else:
+                run(["apk", "add", "openssl-dev"])
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)

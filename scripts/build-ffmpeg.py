@@ -10,6 +10,7 @@ import subprocess
 from cibuildpkg import Builder, Package, When, fetch, get_platform, log_group, run
 
 plat = platform.system()
+is_musllinux = plat == "Linux" and platform.libc_ver()[0] != "glibc"
 
 
 def calculate_sha256(filename: str) -> str:
@@ -211,6 +212,8 @@ codec_group = [
     Package(
         name="x264",
         source_url="https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2",
+        # assembly contains textrels which are not supported by musl
+        build_arguments=["--disable-asm"] if is_musllinux else [],
         # parallel build runs out of memory on Windows
         build_parallel=plat != "Windows",
         when=When.community_only,
