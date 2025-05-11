@@ -32,7 +32,9 @@ def get_platform() -> str:
     elif system == "Darwin":
         return f"macosx_{machine}"
     elif system == "Windows":
-        if struct.calcsize("P") * 8 == 64:
+        if machine == "ARM64":
+            return "win_arm64"
+        elif struct.calcsize("P") * 8 == 64:
             return "win_amd64"
         else:
             return "win32"
