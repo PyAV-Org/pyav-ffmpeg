@@ -1,6 +1,7 @@
---- libvpx-1.11.0.orig/build/make/Makefile	    2021-10-06 19:41:19.000000000 +0200
-+++ libvpx-1.11.0/build/make/Makefile	        2022-03-28 10:41:12.000000000 +0200
-@@ -320,7 +320,7 @@
+diff -urN libvpx-1.15.1.orig/build/make/Makefile libvpx-1.15.1/build/make/Makefile
+--- libvpx-1.15.1.orig/build/make/Makefile	2025-01-10 20:30:59.000000000 +0100
++++ libvpx-1.15.1/build/make/Makefile	2025-05-16 12:51:03.935009212 +0200
+@@ -350,7 +350,7 @@
  	$(if $(quiet),@echo "    [LD] $$@")
  	$(qexec)$$(LD) -dynamiclib $$(LDFLAGS) \
  	    -exported_symbols_list $$(EXPORTS_FILE) \
@@ -9,7 +10,7 @@
          -o $$@ \
          $$(filter %.o,$$^) $$(extralibs)
  endef
-@@ -336,6 +336,20 @@
+@@ -366,6 +366,20 @@
          $$(filter %.o,$$^) $$(extralibs) $$(EXPORTS_FILE)
  endef
  
@@ -30,7 +31,7 @@
  
  #
  # Get current configuration
-@@ -395,6 +409,7 @@
+@@ -425,6 +439,7 @@
  $(foreach lib,$(filter %so.$(SO_VERSION_MAJOR).$(SO_VERSION_MINOR).$(SO_VERSION_PATCH),$(LIBS)),$(eval $(call so_template,$(lib))))
  $(foreach lib,$(filter %$(SO_VERSION_MAJOR).dylib,$(LIBS)),$(eval $(call dl_template,$(lib))))
  $(foreach lib,$(filter %$(SO_VERSION_MAJOR).dll,$(LIBS)),$(eval $(call dll_template,$(lib))))
@@ -38,9 +39,10 @@
  
  INSTALL-LIBS=$(call cond_enabled,CONFIG_INSTALL_LIBS,INSTALL-LIBS)
  ifeq ($(MAKECMDGOALS),dist)
---- libvpx-1.11.0.orig/build/make/configure.sh  	2021-10-06 19:41:19.000000000 +0200
-+++ libvpx-1.11.0/build/make/configure.sh           2022-03-29 19:54:58.000000000 +0200
-@@ -650,7 +650,10 @@
+diff -urN libvpx-1.15.1.orig/build/make/configure.sh libvpx-1.15.1/build/make/configure.sh
+--- libvpx-1.15.1.orig/build/make/configure.sh	2025-01-10 20:30:59.000000000 +0100
++++ libvpx-1.15.1/build/make/configure.sh	2025-05-16 12:51:03.935009212 +0200
+@@ -703,7 +703,10 @@
        --libdir=*)
          libdir="${optval}"
          ;;
@@ -52,7 +54,7 @@
          die "Option ${opt} requires argument"
          ;;
        --help|-h)
-@@ -679,9 +682,14 @@
+@@ -732,9 +735,14 @@
    prefix="${prefix%/}"
    libdir="${libdir:-${prefix}/lib}"
    libdir="${libdir%/}"
@@ -67,9 +69,10 @@
  }
  
  post_process_cmdline() {
---- libvpx-1.11.0.orig/configure	2021-10-06 19:41:19.000000000 +0200
-+++ libvpx-1.11.0/configure         2022-03-29 19:54:58.000000000 +0200
-@@ -501,6 +501,7 @@
+diff -urN libvpx-1.15.1.orig/configure libvpx-1.15.1/configure
+--- libvpx-1.15.1.orig/configure	2025-01-10 20:30:59.000000000 +0100
++++ libvpx-1.15.1/configure	2025-05-16 12:51:03.935009212 +0200
+@@ -532,6 +532,7 @@
  DIST_DIR?=\$(DESTDIR)${prefix}
  endif
  LIBSUBDIR=${libdir##${prefix}/}
@@ -77,7 +80,7 @@
  
  VERSION_STRING=${VERSION_STRING}
  
-@@ -539,6 +540,8 @@
+@@ -570,6 +571,8 @@
          *)
              if enabled gnu; then
                  echo "--enable-shared is only supported on ELF; assuming this is OK"
@@ -86,9 +89,10 @@
              else
                  die "--enable-shared only supported on ELF, OS/2, and Darwin for now"
              fi
---- libvpx-1.11.0.orig/libs.mk  	2021-10-06 19:41:19.000000000 +0200
-+++ libvpx-1.11.0/libs.mk           2022-03-29 19:54:58.000000000 +0200
-@@ -137,6 +137,7 @@
+diff -urN libvpx-1.15.1.orig/libs.mk libvpx-1.15.1/libs.mk
+--- libvpx-1.15.1.orig/libs.mk	2025-01-10 20:30:59.000000000 +0100
++++ libvpx-1.15.1/libs.mk	2025-05-16 12:51:03.935009212 +0200
+@@ -150,6 +150,7 @@
  INSTALL_MAPS += include/vpx/% $(SRC_PATH_BARE)/vpx/%
  INSTALL_MAPS += include/vpx/% $(SRC_PATH_BARE)/vpx_ports/%
  INSTALL_MAPS += $(LIBSUBDIR)/%     %
@@ -96,7 +100,7 @@
  INSTALL_MAPS += src/%     $(SRC_PATH_BARE)/%
  ifeq ($(CONFIG_MSVS),yes)
  INSTALL_MAPS += $(foreach p,$(VS_PLATFORMS),$(LIBSUBDIR)/$(p)/%  $(p)/Release/%)
-@@ -322,6 +323,13 @@
+@@ -336,6 +337,13 @@
  LIBVPX_SO_SYMLINKS      :=
  LIBVPX_SO_IMPLIB        := libvpx_dll.a
  else
@@ -110,7 +114,7 @@
  LIBVPX_SO               := libvpx.so.$(SO_VERSION_MAJOR).$(SO_VERSION_MINOR).$(SO_VERSION_PATCH)
  SHARED_LIB_SUF          := .so
  EXPORT_FILE             := libvpx.ver
-@@ -331,6 +339,7 @@
+@@ -345,6 +353,7 @@
  endif
  endif
  endif
@@ -118,7 +122,7 @@
  
  LIBS-$(CONFIG_SHARED) += $(BUILD_PFX)$(LIBVPX_SO)\
                             $(notdir $(LIBVPX_SO_SYMLINKS)) \
-@@ -353,6 +362,10 @@ libvpx_dll.a: $(LIBVPX_SO)
+@@ -367,6 +376,10 @@
  	$(qexec)emximp -o $@ $<
  CLEAN-OBJS += libvpx_dll.a
  
@@ -129,8 +133,12 @@
  define libvpx_symlink_template
  $(1): $(2)
  	@echo "    [LN]     $(2) $$@"
-@@ -371,3 +384,3 @@
+@@ -383,7 +396,7 @@
+ 
+ 
  INSTALL-LIBS-$(CONFIG_SHARED) += $(LIBVPX_SO_SYMLINKS)
 -INSTALL-LIBS-$(CONFIG_SHARED) += $(LIBSUBDIR)/$(LIBVPX_SO)
 +INSTALL-LIBS-$(CONFIG_SHARED) += $(if $(filter win%,$(TGT_OS)),$(BINSUBDIR),$(LIBSUBDIR))/$(LIBVPX_SO)
  INSTALL-LIBS-$(CONFIG_SHARED) += $(if $(LIBVPX_SO_IMPLIB),$(LIBSUBDIR)/$(LIBVPX_SO_IMPLIB))
+ 
+ 
