@@ -127,7 +127,7 @@ class When(IntEnum):
 class Package:
     name: str
     source_url: str
-    sha256: str | None = None
+    sha256: str
     build_system: str = "autoconf"
     build_arguments: list[str] = field(default_factory=list)
     build_dir: str = "build"
