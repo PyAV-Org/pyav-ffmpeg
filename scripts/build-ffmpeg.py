@@ -338,7 +338,7 @@ def main():
 
     # Fix winpthreads breakage until the fix reaches msys2 repos.
     if plat == "Windows":
-        run(["patch", "-d", "C:/msys64/mingw64", "-i", os.path.join(builder.patch_dir, "winpthreads.patch"), "-p3"])
+        run(["patch", "-d", "C:/msys64/ucrt64", "-i", os.path.join(builder.patch_dir, "winpthreads.patch"), "-p3"])
 
     # install packages
     available_tools = set()
