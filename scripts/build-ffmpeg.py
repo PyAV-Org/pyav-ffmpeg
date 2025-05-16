@@ -46,8 +46,8 @@ library_group = [
     ),
     Package(
         name="xml2",
-        source_url="https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz",
-        sha256="276130602d12fe484ecc03447ee5e759d0465558fbc9d6bd144e3745306ebf0e",
+        source_url="https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.3.tar.xz",
+        sha256="6de55cacc8c2bc758f2ef6f93c313cb30e4dd5d84ac5d3c7ccbd9344d8cc6833",
         requires=["xz"],
         build_arguments=["--without-python"],
     ),
