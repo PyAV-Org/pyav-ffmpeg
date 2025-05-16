@@ -1,0 +1,26 @@
+Temporary patch for this issue:
+
+https://sourceforge.net/p/mingw-w64/mailman/message/59184409/
+
+This patch can be removed once msys2's packages have been updated.
+
+--- a/mingw-w64-libraries/winpthreads/include/pthread_time.h
++++ b/mingw-w64-libraries/winpthreads/include/pthread_time.h
+@@ -23,6 +23,7 @@
+ #ifndef WIN_PTHREADS_TIME_H
+ #define WIN_PTHREADS_TIME_H
+ 
++#include <sys/timeb.h>
+ #include "pthread_compat.h"
+ 
+ /* Posix timers are supported */
+--- a/mingw-w64-libraries/winpthreads/include/semaphore.h
++++ b/mingw-w64-libraries/winpthreads/include/semaphore.h
+@@ -23,6 +23,7 @@
+ #ifndef WIN_PTHREADS_SEMAPHORE_H
+ #define WIN_PTHREADS_SEMAPHORE_H
+ 
++#include <sys/timeb.h>
+ #include "pthread_compat.h"
+ 
+ #ifdef __cplusplus
