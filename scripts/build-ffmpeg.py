@@ -205,13 +205,15 @@ codec_group = [
     Package(
         name="opencore-amr",
         source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
+        sha256="2c006cb9d5f651bfb5e60156dbff6af3c9d35c7bbcc9015308c0aff1e14cd341",
         # parallel build hangs on Windows
         build_parallel=plat != "Windows",
         when=When.community_only,
     ),
     Package(
         name="x264",
-        source_url="https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2",
+        source_url="https://code.videolan.org/videolan/x264/-/archive/32c3b801191522961102d4bea292cdb61068d0dd/x264-32c3b801191522961102d4bea292cdb61068d0dd.tar.bz2",
+        sha256="d7748f350127cea138ad97479c385c9a35a6f8527bc6ef7a52236777cf30b839",
         # assembly contains textrels which are not supported by musl
         build_arguments=["--disable-asm"] if is_musllinux else [],
         # parallel build runs out of memory on Windows
@@ -221,6 +223,7 @@ codec_group = [
     Package(
         name="x265",
         source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
+        sha256="e70a3335cacacbba0b3a20ec6fecd6783932288ebc8163ad74bcc9606477cae8",
         build_system="cmake",
         source_dir="source",
         when=When.community_only,
@@ -228,6 +231,7 @@ codec_group = [
     Package(
         name="srt",
         source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
+        sha256="d0a8b600fe1b4eaaf6277530e3cfc8f15b8ce4035f16af4a5eb5d4b123640cdd",
         build_system="cmake",
         build_arguments=(
             [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
@@ -256,7 +260,7 @@ ffmpeg_package = Package(
 )
 
 
-def download_and_verify_package(package: Package) -> tuple[str, str]:
+def download_and_verify_package(package: Package) -> None:
     tarball = os.path.join(
         os.path.abspath("source"),
         package.source_filename or package.source_url.split("/")[-1],
@@ -272,16 +276,12 @@ def download_and_verify_package(package: Package) -> tuple[str, str]:
         raise ValueError(f"tar bar doesn't exist: {tarball}")
 
     sha = calculate_sha256(tarball)
-    if package.sha256 is None:
-        print(f"sha256 for {package.name}: {sha}")
-    elif package.sha256 == sha:
+    if package.sha256 == sha:
         print(f"{package.name} tarball: hashes match")
     else:
         raise ValueError(
             f"sha256 hash of {package.name} tarball do not match!\nExpected: {package.sha256}\nGot: {sha}"
         )
-
-    return package.name, tarball
 
 
 def download_tars(packages: list[Package]) -> None:
@@ -292,8 +292,9 @@ def download_tars(packages: list[Package]) -> None:
         }
 
         for future in concurrent.futures.as_completed(future_to_package):
+            name = future_to_package[future]
             try:
-                name, tarball = future.result()
+                future.result()
             except Exception as exc:
                 print(f"{name} generated an exception: {exc}")
                 raise
