@@ -56,13 +56,13 @@ library_group = [
 gnutls_group = [
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz",
-        sha256="fd6d5662fa706487c48349a758b57bc149ce94ec6c30624ec9fdc473ceabbc8e",
+        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.gz",
+        sha256="8ea8ccf86c09dd801c8cac19878e804e54f707cf69884371130d20bde68386b7",
     ),
     Package(
         name="nettle",
-        source_url="https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz",
-        sha256="ccfeff981b0ca71bbd6fbcb054f407c60ffb644389a5be80d6716d5b550c6ce3",
+        source_url="https://ftp.gnu.org/gnu/nettle/nettle-3.10.1.tar.gz",
+        sha256="b0fcdd7fc0cdea6e80dcf1dd85ba794af0d5b4a57e26397eee3bc193272d9132",
         requires=["gmp"],
         build_arguments=["--disable-documentation"],
         # build randomly fails with "*** missing separator.  Stop."
@@ -70,8 +70,8 @@ gnutls_group = [
     ),
     Package(
         name="gnutls",
-        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.1.tar.xz",
-        sha256="ba8b9e15ae20aba88f44661978f5b5863494316fe7e722ede9d069fe6294829c",
+        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz",
+        sha256="69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed",
         requires=["nettle", "unistring"],
         build_arguments=[
             "--disable-cxx",
@@ -278,7 +278,7 @@ def download_and_verify_package(package: Package) -> tuple[str, str]:
         print(f"{package.name} tarball: hashes match")
     else:
         raise ValueError(
-            f"sha256 hash of {package.name} tarball do not match!\nExpected: {package.sha}\nGot: {sha}"
+            f"sha256 hash of {package.name} tarball do not match!\nExpected: {package.sha256}\nGot: {sha}"
         )
 
     return package.name, tarball
