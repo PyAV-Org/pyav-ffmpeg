@@ -336,10 +336,6 @@ def main():
     builder = Builder(dest_dir=dest_dir)
     builder.create_directories()
 
-    # Fix winpthreads breakage until the fix reaches msys2 repos.
-    if plat == "Windows":
-        run(["patch", "-d", "C:/msys64/mingw64", "-i", os.path.join(builder.patch_dir, "winpthreads.patch"), "-p3"])
-
     # install packages
     available_tools = set()
     if plat == "Windows":
