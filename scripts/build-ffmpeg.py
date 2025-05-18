@@ -53,6 +53,15 @@ library_group = [
     ),
 ]
 
+cuda_group = [
+    Package(
+        name="nv-codec-headers",
+        source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
+        sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
+        build_system="make",
+    )
+]
+
 gnutls_group = [
     Package(
         name="unistring",
@@ -193,7 +202,6 @@ codec_group = [
         source_filename="openh264-2.6.0.tar.gz",
         requires=["meson", "ninja"],
         build_system="meson",
-        when=When.commercial_only,
     ),
     Package(
         name="fdk_aac",
@@ -243,13 +251,6 @@ codec_group = [
         when=When.community_only,
     ),
 ]
-
-nvheaders = Package(
-    name="nv-codec-headers",
-    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
-    sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
-    build_system="make",
-)
 
 ffmpeg_package = Package(
     name="ffmpeg",
@@ -301,31 +302,22 @@ def download_tars(packages: list[Package]) -> None:
 
 
 def main():
-    global library_group
-
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
     parser.add_argument("--community", action="store_true")
-    parser.add_argument("--commercial", action="store_true")
-    parser.add_argument(
-        "--enable-cuda", action="store_true", help="Enable NVIDIA CUDA support"
-    )
 
     args = parser.parse_args()
 
-    if args.community and args.commercial:
-        raise ValueError("mutually exclusive")
-
     dest_dir = args.destination
     community = args.community
-    enable_cuda = args.enable_cuda and plat in {"Linux", "Windows"}
-    del args
 
-    output_dir = os.path.abspath("output")
+    # Use CUDA if supported.
+    use_cuda = plat in {"Linux", "Windows"}
 
     # FFmpeg has native TLS backends for macOS and Windows
     use_gnutls = plat == "Linux"
 
+    output_dir = os.path.abspath("output")
     if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         output_dir = "/output"
     output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
@@ -404,7 +396,7 @@ def main():
         "--enable-version3",
     ]
 
-    if enable_cuda:
+    if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
     if community:
@@ -438,24 +430,21 @@ def main():
         ]
     )
 
+    packages = []
+    packages += library_group
+    if use_cuda:
+        packages += cuda_group
     if use_gnutls:
-        library_group += gnutls_group
-    if enable_cuda:
-        library_group += [nvheaders]
-
-    package_groups = [library_group + codec_group, [ffmpeg_package]]
-    packages = [p for p_list in package_groups for p in p_list]
+        packages += gnutls_group
+    packages += codec_group
+    packages += [ffmpeg_package]
 
     filtered_packages = []
-
     for package in packages:
-        if package.when == When.never:
-            continue
         if package.when == When.community_only and not community:
             continue
         if package.when == When.commercial_only and community:
             continue
-
         filtered_packages.append(package)
 
     download_tars(build_tools + filtered_packages)
