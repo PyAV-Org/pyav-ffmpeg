@@ -24,6 +24,7 @@ Currently FFmpeg 7.1.1 is built with the following packages enabled for all plat
 - lame 3.100
 - ogg 1.3.5
 - opencore-amr 0.1.5
+- openh264 2.6.0
 - opus 1.5.2
 - speex 1.2.1
 - svt-av1 3.0.1
