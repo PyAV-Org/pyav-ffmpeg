@@ -411,6 +411,7 @@ def main():
         ffmpeg_package.build_arguments.extend(
             [
                 "--enable-libx264",
+                "--enable-libx265",
                 "--disable-libopenh264",
                 "--enable-gpl",
             ]
