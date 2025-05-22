@@ -369,10 +369,16 @@ class Builder:
 
         # For 10/12 bits version, only x86_64 has assembly instructions available
         flags_high_bits = []
-        platform = get_platform()
-        if not ("x86_64" in platform or "amd64" in platform):
+
+        disable_sve = platform.system() == "Linux" and platform.machine() == "aarch64"
+        platform_str = get_platform()
+
+        if not ("x86_64" in platform_str or "amd64" in platform_str):
             flags_high_bits.append("-DENABLE_ASSEMBLY=0")
             flags_high_bits.append("-DENABLE_ALTIVEC=0")
+
+            if disable_sve:
+                flags_high_bits.append("-DENABLE_SVE2=OFF")
 
         x265_12bits = replace(
             package,
@@ -414,7 +420,7 @@ class Builder:
             "-DLINKED_10BIT=1",
             "-DLINKED_12BIT=1",
             "-DEXTRA_LINK_FLAGS=-L../x265-10bits -L../x265-12bits",
-        ]
+        ] + (["-DENABLE_SVE2=OFF"] if disable_sve else [])
         self._build_with_cmake(package=package, for_builder=for_builder)
 
     def _extract(self, package: Package) -> None:

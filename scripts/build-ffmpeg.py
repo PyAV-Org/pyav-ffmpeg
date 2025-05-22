@@ -105,8 +105,8 @@ codec_group = [
     ),
     Package(
         name="dav1d",
-        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.4.1/dav1d-1.4.1.tar.bz2",
-        sha256="ab02c6c72c69b2b24726251f028b7cb57d5b3659eeec9f67f6cecb2322b127d8",
+        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.1/dav1d-1.5.1.tar.bz2",
+        sha256="4eddffd108f098e307b93c9da57b6125224dc5877b1b3d157b31be6ae8f1f093",
         requires=["meson", "nasm", "ninja"],
         build_system="meson",
     ),
@@ -193,7 +193,6 @@ codec_group = [
         source_filename="openh264-2.6.0.tar.gz",
         requires=["meson", "ninja"],
         build_system="meson",
-        when=When.commercial_only,
     ),
     Package(
         name="fdk_aac",
@@ -222,8 +221,8 @@ codec_group = [
     ),
     Package(
         name="x265",
-        source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz",
-        sha256="e70a3335cacacbba0b3a20ec6fecd6783932288ebc8163ad74bcc9606477cae8",
+        source_url="https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz",
+        sha256="a31699c6a89806b74b0151e5e6a7df65de4b49050482fe5ebf8a4379d7af8f29",
         build_system="cmake",
         source_dir="source",
         when=When.community_only,
@@ -311,24 +310,17 @@ def main():
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
     parser.add_argument("--community", action="store_true")
-    parser.add_argument("--commercial", action="store_true")
-    parser.add_argument(
-        "--enable-cuda", action="store_true", help="Enable NVIDIA CUDA support"
-    )
 
     args = parser.parse_args()
-
-    if args.community and args.commercial:
-        raise ValueError("mutually exclusive")
 
     dest_dir = args.destination
     community = args.community
 
-    # Use CUDA if requested and supported.
-    use_cuda = args.enable_cuda and plat in {"Linux", "Windows"}
-
     # Use ALSA only on Linux.
     use_alsa = plat == "Linux"
+
+    # Use CUDA if supported.
+    use_cuda = plat in {"Linux", "Windows"}
 
     # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
@@ -419,6 +411,7 @@ def main():
         ffmpeg_package.build_arguments.extend(
             [
                 "--enable-libx264",
+                "--enable-libx265",
                 "--disable-libopenh264",
                 "--enable-gpl",
             ]
@@ -451,6 +444,7 @@ def main():
         packages += [alsa_package]
     if use_cuda:
         packages += [nvheaders_package]
+
     if use_gnutls:
         packages += gnutls_group
     packages += codec_group
