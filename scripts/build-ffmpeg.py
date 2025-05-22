@@ -53,15 +53,6 @@ library_group = [
     ),
 ]
 
-cuda_group = [
-    Package(
-        name="nv-codec-headers",
-        source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
-        sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
-        build_system="make",
-    )
-]
-
 gnutls_group = [
     Package(
         name="unistring",
@@ -252,6 +243,20 @@ codec_group = [
     ),
 ]
 
+alsa_package = Package(
+    name="alsa-lib",
+    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
+    sha256="be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32",
+    build_arguments=["--disable-python"],
+)
+
+nvheaders_package = Package(
+    name="nv-codec-headers",
+    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
+    sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
+    build_system="make",
+)
+
 ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz",
@@ -311,10 +316,13 @@ def main():
     dest_dir = args.destination
     community = args.community
 
+    # Use ALSA only on Linux.
+    use_alsa = plat == "Linux"
+
     # Use CUDA if supported.
     use_cuda = plat in {"Linux", "Windows"}
 
-    # FFmpeg has native TLS backends for macOS and Windows
+    # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
 
     output_dir = os.path.abspath("output")
@@ -362,7 +370,7 @@ def main():
         )
 
     ffmpeg_package.build_arguments = [
-        "--disable-alsa",
+        "--enable-alsa" if use_alsa else "--disable-alsa",
         "--disable-doc",
         "--disable-libtheora",
         "--disable-libfreetype",
@@ -431,10 +439,12 @@ def main():
         ]
     )
 
-    packages = []
-    packages += library_group
+    packages = library_group[:]
+    if use_alsa:
+        packages += [alsa_package]
     if use_cuda:
-        packages += cuda_group
+        packages += [nvheaders_package]
+
     if use_gnutls:
         packages += gnutls_group
     packages += codec_group
