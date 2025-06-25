@@ -44,13 +44,6 @@ library_group = [
         # out-of-tree builds fail on Windows
         build_dir=".",
     ),
-    Package(
-        name="xml2",
-        source_url="https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.3.tar.xz",
-        sha256="6de55cacc8c2bc758f2ef6f93c313cb30e4dd5d84ac5d3c7ccbd9344d8cc6833",
-        requires=["xz"],
-        build_arguments=["--without-python"],
-    ),
 ]
 
 gnutls_group = [
@@ -372,6 +365,7 @@ def main():
     ffmpeg_package.build_arguments = [
         "--enable-alsa" if use_alsa else "--disable-alsa",
         "--disable-doc",
+        "--disable-libxml2",
         "--disable-libtheora",
         "--disable-libfreetype",
         "--disable-libfontconfig",
@@ -398,7 +392,6 @@ def main():
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
-        "--enable-libxml2" if community else "--disable-libxml2",
         "--enable-lzma",
         "--enable-zlib",
         "--enable-version3",

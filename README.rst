@@ -17,7 +17,6 @@ Features
 Currently FFmpeg 7.1.1 is built with the following packages enabled for all platforms:
 
 - gmp 6.3.0
-- xml2 2.14.3
 - xz 5.6.3
 - aom 3.11.0
 - dav1d 1.4.1
