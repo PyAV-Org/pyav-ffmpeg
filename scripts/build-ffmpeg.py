@@ -23,21 +23,6 @@ def calculate_sha256(filename: str) -> str:
 
 library_group = [
     Package(
-        name="xz",
-        source_url="https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.xz",
-        sha256="db0590629b6f0fa36e74aea5f9731dc6f8df068ce7b7bafa45301832a5eebc3a",
-        build_arguments=[
-            "--disable-doc",
-            "--disable-lzma-links",
-            "--disable-lzmadec",
-            "--disable-lzmainfo",
-            "--disable-nls",
-            "--disable-scripts",
-            "--disable-xz",
-            "--disable-xzdec",
-        ],
-    ),
-    Package(
         name="gmp",
         source_url="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
         sha256="a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898",
@@ -306,7 +291,7 @@ def main():
 
     args = parser.parse_args()
 
-    dest_dir = args.destination
+    dest_dir = os.path.abspath(args.destination)
     community = args.community
 
     # Use ALSA only on Linux.
@@ -363,9 +348,10 @@ def main():
         )
 
     ffmpeg_package.build_arguments = [
-        "--enable-alsa" if use_alsa else "--disable-alsa",
+        "--disable-programs",
         "--disable-doc",
         "--disable-libxml2",
+        "--disable-lzma",  # or re-add xz package
         "--disable-libtheora",
         "--disable-libfreetype",
         "--disable-libfontconfig",
@@ -377,6 +363,7 @@ def main():
             else "--disable-mediafoundation"
         ),
         "--enable-gmp",
+        "--enable-alsa" if use_alsa else "--disable-alsa",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libaom",
         "--enable-libdav1d",
@@ -392,7 +379,6 @@ def main():
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
-        "--enable-lzma",
         "--enable-zlib",
         "--enable-version3",
     ]
