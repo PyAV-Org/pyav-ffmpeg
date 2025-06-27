@@ -362,6 +362,7 @@ def main():
             if plat == "Windows"
             else "--disable-mediafoundation"
         ),
+        "--enable-version3",
         "--enable-gmp",
         "--enable-alsa" if use_alsa else "--disable-alsa",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
@@ -378,27 +379,18 @@ def main():
         "--enable-libvorbis",
         "--enable-libvpx",
         "--enable-libwebp",
+        "--enable-libopenh264",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-zlib",
-        "--enable-version3",
     ]
 
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
     if community:
-        ffmpeg_package.build_arguments.extend(
-            [
-                "--enable-libx264",
-                "--enable-libx265",
-                "--disable-libopenh264",
-                "--enable-gpl",
-            ]
-        )
+        ffmpeg_package.build_arguments.extend(["--enable-libx264", "--enable-libx265"])
     else:
-        ffmpeg_package.build_arguments.extend(
-            ["--enable-libopenh264", "--disable-libx264", "--enable-libfdk_aac"]
-        )
+        ffmpeg_package.build_arguments.append("--enable-libfdk_aac")
 
     if plat == "Darwin":
         ffmpeg_package.build_arguments.extend(
