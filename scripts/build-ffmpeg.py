@@ -382,14 +382,14 @@ def main():
         "--enable-libopenh264",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-zlib",
+        "--enable-libx264",
+        "--enable-libx265",
     ]
 
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
-    if community:
-        ffmpeg_package.build_arguments.extend(["--enable-libx264", "--enable-libx265"])
-    else:
+    if not community:
         ffmpeg_package.build_arguments.append("--enable-libfdk_aac")
 
     if plat == "Darwin":
