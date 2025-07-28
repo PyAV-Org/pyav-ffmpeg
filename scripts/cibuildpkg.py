@@ -134,7 +134,6 @@ class Package:
     requires: list[str] = field(default_factory=list)
     source_dir: str = ""
     source_filename: str = ""
-    source_strip_components: int = 1
     when: When = When.always
 
     def __lt__(self, other):
@@ -424,10 +423,6 @@ class Builder:
         self._build_with_cmake(package=package, for_builder=for_builder)
 
     def _extract(self, package: Package) -> None:
-        assert package.source_strip_components in (
-            0,
-            1,
-        ), "source_strip_components must be 0 or 1"
         path = os.path.join(self.build_dir, package.name)
         patch = os.path.join(self.patch_dir, package.name + ".patch")
         tarball = os.path.join(
@@ -440,16 +435,13 @@ class Builder:
 
         with tarfile.open(tarball) as tar:
             # determine common prefix to strip
-            if package.source_strip_components:
-                prefixes = set()
-                for name in tar.getnames():
-                    prefixes.add(name.split("/")[0])
-                assert len(prefixes) == 1, (
-                    "cannot strip path components, multiple prefixes found"
-                )
-                prefix = list(prefixes)[0]
-            else:
-                prefix = ""
+            prefixes = set()
+            for name in tar.getnames():
+                prefixes.add(name.split("/")[0])
+            assert len(prefixes) == 1, (
+                "cannot strip path components, multiple prefixes found"
+            )
+            prefix = list(prefixes)[0]
 
             # extract archive
             with tempfile.TemporaryDirectory(dir=self.build_dir) as temp_dir:
