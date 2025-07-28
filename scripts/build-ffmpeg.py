@@ -71,7 +71,6 @@ codec_group = [
         source_url="https://storage.googleapis.com/aom-releases/libaom-3.11.0.tar.gz",
         sha256="cf7d103d2798e512aca9c6e7353d7ebf8967ee96fffe9946e015bb9947903e3e",
         requires=["cmake"],
-        source_strip_components=1,
         build_system="cmake",
         build_arguments=[
             "-DENABLE_DOCS=0",
