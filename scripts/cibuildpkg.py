@@ -100,22 +100,6 @@ def run(cmd: list[str], env=None) -> None:
         raise e
 
 
-def correct_configure(file_path: str) -> None:
-    """
-    Edit ffmpeg's configure file. Properly quote `$pkg_version` in function `test_pkg_config()`.
-    """
-    old_string = "test_cmd $pkg_config --exists --print-errors $pkg_version || return"
-    new_string = 'test_cmd $pkg_config --exists --print-errors "$pkg_version" || return'
-
-    with open(file_path) as file:
-        content = file.read()
-
-    updated_content = content.replace(old_string, new_string)
-
-    with open(file_path, "w") as file:
-        file.write(updated_content)
-
-
 class When(IntEnum):
     always = 0
     community_only = 1
@@ -266,7 +250,6 @@ class Builder:
                 configure_args += ["--target=x86_64-win64-gcc"]
 
         if package.name == "ffmpeg" and platform.system() == "Windows":
-            correct_configure(os.path.join(package_source_path, "configure"))
             prepend_env(env, "LDFLAGS", "-LC:/PROGRA~1/OpenSSL/lib")
             prepend_env(
                 env,
