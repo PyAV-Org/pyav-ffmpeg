@@ -23,7 +23,7 @@ jobs:
           - os: macos-14
             arch: arm64
             shell: bash
-          - os: macos-13
+          - os: macos-15-intel
             arch: x86_64
             shell: bash
           - os: ubuntu-24.04-arm
@@ -49,10 +49,10 @@ jobs:
         with:
           python-version: "3.13"
       - name: Set deployment target
-        if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
+        if: runner.os == 'macOS'
+        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
       - name: Install packages for macOS
-        if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
+        if: runner.os == 'macOS'
         run: |
           brew update
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxau libxcb libxdmcp little-cms2 unbound
@@ -68,7 +68,7 @@ jobs:
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor --community
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor --community
           CIBW_BUILD: cp311-*
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair -w {dest_dir} {wheel}
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
