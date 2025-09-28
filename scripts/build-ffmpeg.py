@@ -204,20 +204,20 @@ codec_group = [
         source_dir="source",
         when=When.community_only,
     ),
-    Package(
-        name="srt",
-        source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
-        sha256="d0a8b600fe1b4eaaf6277530e3cfc8f15b8ce4035f16af4a5eb5d4b123640cdd",
-        build_system="cmake",
-        build_arguments=(
-            [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
-            if plat == "Windows"
-            else ["-DENABLE_ENCRYPTION=OFF"]
-            if plat == "Darwin"
-            else [""]
-        ),
-        when=When.community_only,
-    ),
+    # Package(
+    #     name="srt",
+    #     source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
+    #     sha256="d0a8b600fe1b4eaaf6277530e3cfc8f15b8ce4035f16af4a5eb5d4b123640cdd",
+    #     build_system="cmake",
+    #     build_arguments=(
+    #         [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
+    #         if plat == "Windows"
+    #         else ["-DENABLE_ENCRYPTION=OFF"]
+    #         if plat == "Darwin"
+    #         else [""]
+    #     ),
+    #     when=When.community_only,
+    # ),
 ]
 
 alsa_package = Package(
@@ -373,7 +373,7 @@ def main():
         "--enable-libopus",
         "--enable-libspeex",
         "--enable-libsvtav1",
-        "--enable-libsrt" if community else "--disable-libsrt",
+        # "--enable-libsrt" if community else "--disable-libsrt",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
