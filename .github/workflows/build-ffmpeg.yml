@@ -30,9 +30,6 @@ jobs:
             arch: aarch64
             shell: bash
           - os: ubuntu-24.04
-            arch: i686
-            shell: bash
-          - os: ubuntu-24.04
             arch: x86_64
             shell: bash
           - os: windows-latest
@@ -50,7 +47,12 @@ jobs:
           python-version: "3.13"
       - name: Set deployment target
         if: runner.os == 'macOS'
-        run: echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+        run: |
+          if [ "${{ matrix.arch }}" = "x86_64" ]; then
+            echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> $GITHUB_ENV
+          else
+            echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+          fi
       - name: Install packages for macOS
         if: runner.os == 'macOS'
         run: |
