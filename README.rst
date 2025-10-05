@@ -14,26 +14,25 @@ The builds are provided for several platforms:
 Features
 --------
 
-Currently FFmpeg 7.1.1 is built with the following packages enabled for all platforms:
+Currently FFmpeg 8.0 is built with the following packages enabled for all platforms:
 
 - gmp 6.3.0
 - aom 3.11.0
-- dav1d 1.4.1
+- dav1d 1.5.1
+- libsvtav1 3.1.0
 - lame 3.100
 - ogg 1.3.5
-- opencore-amr 0.1.5
-- openh264 2.6.0
 - opus 1.5.2
 - speex 1.2.1
-- svt-av1 3.0.1
-- srt 1.5.4 (encryption disabled on macOS)
 - twolame 0.4.0
 - vorbis 1.3.7
 - vpx 1.15.1
 - png 1.6.47
 - webp 1.5.0
-- x264 master
-- x265 3.5
+- openh264 2.6.0
+- opencore-amr 0.1.5
+- x264 32c3b801191522961102d4bea292cdb61068d0dd
+- x265 4.1
 
 The following additional packages are also enabled on Linux:
 
