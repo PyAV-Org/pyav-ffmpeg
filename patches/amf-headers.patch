@@ -1,0 +1,44 @@
+diff -crB --new-file amf-headers-v1.5.0/amf.pc.in amf-headers-v1.5.0_patched/amf.pc.in
+*** amf-headers-v1.5.0/amf.pc.in	1970-01-01 00:00:00.000000000 +0000
+--- amf-headers-v1.5.0_patched/amf.pc.in	2025-11-11 06:48:00.181040000 +0000
+***************
+*** 0 ****
+--- 1,7 ----
++ prefix=@@PREFIX@@
++ includedir=${prefix}/AMF
++ 
++ Name: amf
++ Description: The version of Advanced Media Framework (AMF) SDK headers
++ Version: 1.5.0
++ Cflags: -I${includedir}
+diff -crB --new-file amf-headers-v1.5.0/Makefile amf-headers-v1.5.0_patched/Makefile
+*** amf-headers-v1.5.0/Makefile	1970-01-01 00:00:00.000000000 +0000
+--- amf-headers-v1.5.0_patched/Makefile	2025-11-11 07:34:38.261171572 +0000
+***************
+*** 0 ****
+--- 1,25 ----
++ PREFIX = /usr/local
++ LIBDIR = lib
++ INSTALL = install
++ SED = sed
++ 
++ all:
++ ifeq ($(OS),Windows_NT)
++ 	$(SED) 's#@@PREFIX@@#$(shell cygpath -m ${PREFIX})#' amf.pc.in > amf.pc
++ else
++ 	$(SED) 's#@@PREFIX@@#$(PREFIX)#' amf.pc.in > amf.pc
++ endif
++ 
++ install: all
++ 	$(INSTALL) -m 0755 -d '$(DESTDIR)$(PREFIX)/include/AMF/components'
++ 	$(INSTALL) -m 0755 -d '$(DESTDIR)$(PREFIX)/include/AMF/core'
++ 	$(INSTALL) -m 0644 AMF/components/*.h '$(DESTDIR)$(PREFIX)/include/AMF/components'
++ 	$(INSTALL) -m 0644 AMF/core/*.h '$(DESTDIR)$(PREFIX)/include/AMF/core'
++ 	$(INSTALL) -m 0755 -d '$(DESTDIR)$(PREFIX)/$(LIBDIR)/pkgconfig'
++ 	$(INSTALL) -m 0644 amf.pc '$(DESTDIR)$(PREFIX)/$(LIBDIR)/pkgconfig'
++ 
++ uninstall:
++ 	rm -rf '$(DESTDIR)$(PREFIX)/include/AMF' '$(DESTDIR)$(PREFIX)/$(LIBDIR)/pkgconfig/amf.pc'
++ 
++ .PHONY: all install uninstall
++ 
