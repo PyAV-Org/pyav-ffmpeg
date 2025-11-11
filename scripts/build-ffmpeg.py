@@ -234,6 +234,13 @@ nvheaders_package = Package(
     build_system="make",
 )
 
+amfheaders_package = Package(
+    name="amf-headers",
+    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.0/AMF-headers-v1.5.0.tar.gz",
+    sha256="d569647fa26f289affe81a206259fa92f819d06db1e80cc334559953e82a3f01",
+    build_system="make",
+)
+
 ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz",
@@ -299,6 +306,9 @@ def main():
     # Use CUDA if supported.
     use_cuda = plat in {"Linux", "Windows"}
 
+    # Use AMD AMF if supported.
+    use_amf = plat in {"Linux", "Windows"}
+
     # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
 
@@ -341,8 +351,8 @@ def main():
         build_tools.append(
             Package(
                 name="nasm",
-                source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2",
-                sha256="34fd26c70a277a9fdd54cb5ecf389badedaf48047b269d1008fbc819b24e80bc",
+                source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.bz2",
+                sha256="bef3de159bcd61adf98bb7cc87ee9046e944644ad76b7633f18ab063edb29e57",
             )
         )
 
@@ -388,6 +398,9 @@ def main():
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
+    if use_amf:
+        ffmpeg_package.build_arguments.append("--enable-amf")
+
     if not community:
         ffmpeg_package.build_arguments.append("--enable-libfdk_aac")
 
@@ -414,6 +427,8 @@ def main():
         packages += [alsa_package]
     if use_cuda:
         packages += [nvheaders_package]
+    if use_amf:
+        packages += [amfheaders_package]
 
     if use_gnutls:
         packages += gnutls_group
