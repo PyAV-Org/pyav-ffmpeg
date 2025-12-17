@@ -22,7 +22,7 @@ Currently FFmpeg 8.0 is built with the following packages enabled for all platfo
 - libsvtav1 3.1.0
 - lame 3.100
 - ogg 1.3.5
-- opus 1.5.2
+- opus 1.6
 - speex 1.2.1
 - twolame 0.4.0
 - vorbis 1.3.7
