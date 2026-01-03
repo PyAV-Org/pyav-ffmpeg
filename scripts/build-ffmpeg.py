@@ -68,8 +68,8 @@ gnutls_group = [
 codec_group = [
     Package(
         name="aom",
-        source_url="https://storage.googleapis.com/aom-releases/libaom-3.11.0.tar.gz",
-        sha256="cf7d103d2798e512aca9c6e7353d7ebf8967ee96fffe9946e015bb9947903e3e",
+        source_url="https://storage.googleapis.com/aom-releases/libaom-3.13.1.tar.gz",
+        sha256="19e45a5a7192d690565229983dad900e76b513a02306c12053fb9a262cbeca7d",
         requires=["cmake"],
         build_system="cmake",
         build_arguments=[
@@ -243,8 +243,8 @@ amfheaders_package = Package(
 
 ffmpeg_package = Package(
     name="ffmpeg",
-    source_url="https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz",
-    sha256="b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e",
+    source_url="https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz",
+    sha256="05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41",
     build_arguments=[],
     build_parallel=plat != "Windows",
 )
@@ -351,8 +351,8 @@ def main():
         build_tools.append(
             Package(
                 name="nasm",
-                source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.bz2",
-                sha256="bef3de159bcd61adf98bb7cc87ee9046e944644ad76b7633f18ab063edb29e57",
+                source_url="https://web.archive.org/web/20251127013759/https://www.nasm.us/pub/nasm/releasebuilds/3.01/nasm-3.01.tar.xz",
+                sha256="b7324cbe86e767b65f26f467ed8b12ad80e124e3ccb89076855c98e43a9eddd4",
             )
         )
 

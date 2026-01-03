@@ -17,7 +17,7 @@ Features
 Currently FFmpeg 8.0 is built with the following packages enabled for all platforms:
 
 - gmp 6.3.0
-- aom 3.11.0
+- aom 3.13.3
 - dav1d 1.5.1
 - libsvtav1 3.1.0
 - lame 3.100
