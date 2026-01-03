@@ -241,6 +241,22 @@ amfheaders_package = Package(
     build_system="make",
 )
 
+libvpl_package = Package(
+    name="libvpl",
+    source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.16.0.tar.gz",
+    sha256="d60931937426130ddad9f1975c010543f0da99e67edb1c6070656b7947f633b6",
+    requires=["cmake"],
+    build_system="cmake",
+    build_arguments=[
+        "-DINSTALL_LIB=ON",
+        "-DINSTALL_DEV=ON",
+        "-DINSTALL_EXAMPLES=OFF",
+        "-DBUILD_EXPERIMENTAL=OFF",
+        "-DBUILD_TESTS=OFF",
+        "-DBUILD_EXAMPLES=OFF",
+    ],
+)
+
 ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz",
@@ -308,6 +324,10 @@ def main():
 
     # Use AMD AMF if supported.
     use_amf = plat in {"Linux", "Windows"}
+
+    # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
+    # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
+    use_libvpl = plat in {"Linux", "Windows"}
 
     # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
@@ -401,6 +421,9 @@ def main():
     if use_amf:
         ffmpeg_package.build_arguments.append("--enable-amf")
 
+    if use_libvpl:
+        ffmpeg_package.build_arguments.append("--enable-libvpl")
+
     if not community:
         ffmpeg_package.build_arguments.append("--enable-libfdk_aac")
 
@@ -429,6 +452,8 @@ def main():
         packages += [nvheaders_package]
     if use_amf:
         packages += [amfheaders_package]
+    if use_libvpl:
+        packages += [libvpl_package]
 
     if use_gnutls:
         packages += gnutls_group
