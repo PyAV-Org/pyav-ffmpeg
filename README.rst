@@ -7,18 +7,18 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, i686, aarch64)
+- Linux (x86_64, aarch64) 
 - macOS (x86_64, arm64)
-- Windows (AMD64)
+- Windows (x86_64)
 
 Features
 --------
 
-Currently FFmpeg 8.0 is built with the following packages enabled for all platforms:
+Currently FFmpeg 8.0.1 is built with the following packages enabled for all platforms:
 
 - gmp 6.3.0
 - aom 3.13.3
-- dav1d 1.5.1
+- dav1d 1.5.2
 - libsvtav1 3.1.0
 - lame 3.100
 - ogg 1.3.5
