@@ -91,12 +91,6 @@ codec_group = [
         build_arguments=["--disable-binaries"],
     ),
     Package(
-        name="twolame",
-        source_url="http://deb.debian.org/debian/pool/main/t/twolame/twolame_0.4.0.orig.tar.gz",
-        sha256="cc35424f6019a88c6f52570b63e1baf50f62963a3eac52a03a800bb070d7c87d",
-        build_arguments=["--disable-sndfile"],
-    ),
-    Package(
         name="vorbis",
         source_url="https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.xz",
         sha256="b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b",
@@ -395,7 +389,6 @@ def main():
         "--enable-libopus",
         "--enable-libspeex",
         "--enable-libsvtav1",
-        "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
         "--enable-libwebp",
