@@ -64,7 +64,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         if: matrix.os == 'windows-latest'
         with:
-          install: base-devel openssl-devel ${{ matrix.msys_prefix }}-gcc ${{ matrix.msys_prefix }}-gperf ${{ matrix.msys_prefix }}-nasm
+          install: base-devel openssl-devel ${{ matrix.msys_prefix }}-gcc ${{ matrix.msys_prefix }}-nasm
           msystem: ${{ matrix.msys_system }}
           path-type: inherit
       - name: Build FFmpeg

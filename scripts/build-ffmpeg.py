@@ -328,11 +328,11 @@ def main():
     # install packages
     available_tools = set()
     if plat == "Windows":
-        available_tools.update(["gperf", "nasm"])
+        available_tools.update(["nasm"])
 
         # print tool locations
         print("PATH", os.environ["PATH"])
-        for tool in ["gcc", "g++", "curl", "gperf", "ld", "nasm", "pkg-config"]:
+        for tool in ["gcc", "g++", "curl", "ld", "nasm", "pkg-config"]:
             run(["where", tool])
 
     with log_group("install python packages"):
@@ -340,15 +340,6 @@ def main():
 
     # build tools
     build_tools = []
-    if "gperf" not in available_tools:
-        build_tools.append(
-            Package(
-                name="gperf",
-                source_url="http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz",
-                sha256="588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2",
-            )
-        )
-
     if "nasm" not in available_tools and platform.machine() not in {"arm64", "aarch64"}:
         build_tools.append(
             Package(
