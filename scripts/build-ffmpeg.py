@@ -75,8 +75,8 @@ codec_group = [
     ),
     Package(
         name="ogg",
-        source_url="http://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.gz",
-        sha256="0eb4b4b9420a0f51db142ba3f9c64b333f826532dc0f48c6410ae51f4799b664",
+        source_url="http://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz",
+        sha256="83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638",
     ),
     Package(
         name="opus",
