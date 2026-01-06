@@ -6,8 +6,9 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 
-from cibuildpkg import Builder, Package, When, fetch, get_platform, log_group, run
+from cibuildpkg import Builder, Package, When, fetch, log_group, run
 
 plat = platform.system()
 is_musllinux = plat == "Linux" and platform.libc_ver()[0] != "glibc"
@@ -67,36 +68,10 @@ gnutls_group = [
 
 codec_group = [
     Package(
-        name="aom",
-        source_url="https://storage.googleapis.com/aom-releases/libaom-3.13.1.tar.gz",
-        sha256="19e45a5a7192d690565229983dad900e76b513a02306c12053fb9a262cbeca7d",
-        requires=["cmake"],
-        build_system="cmake",
-        build_arguments=[
-            "-DENABLE_DOCS=0",
-            "-DENABLE_EXAMPLES=0",
-            "-DENABLE_TESTS=0",
-            "-DENABLE_TOOLS=0",
-        ],
-        build_parallel=False,
-    ),
-    Package(
-        name="dav1d",
-        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.2/dav1d-1.5.2.tar.bz2",
-        sha256="c748a3214cf02a6d23bc179a0e8caea9d6ece1e46314ef21f5508ca6b5de6262",
-        requires=["meson", "nasm", "ninja"],
-        build_system="meson",
-    ),
-    Package(
-        name="libsvtav1",
-        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v3.1.0/SVT-AV1-v3.1.0.tar.bz2",
-        sha256="8231b63ea6c50bae46a019908786ebfa2696e5743487270538f3c25fddfa215a",
-        build_system="cmake",
-    ),
-    Package(
         name="lame",
         source_url="http://deb.debian.org/debian/pool/main/l/lame/lame_3.100.orig.tar.gz",
         sha256="ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
+        build_arguments=["--disable-gtktest"],
     ),
     Package(
         name="ogg",
@@ -128,6 +103,33 @@ codec_group = [
         requires=["ogg"],
     ),
     Package(
+        name="aom",
+        source_url="https://storage.googleapis.com/aom-releases/libaom-3.13.1.tar.gz",
+        sha256="19e45a5a7192d690565229983dad900e76b513a02306c12053fb9a262cbeca7d",
+        build_system="cmake",
+        build_arguments=[
+            "-DENABLE_DOCS=0",
+            "-DENABLE_EXAMPLES=0",
+            "-DENABLE_TESTS=0",
+            "-DENABLE_TOOLS=0",
+        ],
+        build_parallel=False,
+    ),
+    Package(
+        name="dav1d",
+        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.2/dav1d-1.5.2.tar.bz2",
+        sha256="c748a3214cf02a6d23bc179a0e8caea9d6ece1e46314ef21f5508ca6b5de6262",
+        requires=["nasm"],
+        build_system="meson",
+    ),
+    Package(
+        name="libsvtav1",
+        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v3.1.0/SVT-AV1-v3.1.0.tar.bz2",
+        sha256="8231b63ea6c50bae46a019908786ebfa2696e5743487270538f3c25fddfa215a",
+        build_system="cmake",
+        build_arguments=["-DBUILD_APPS=OFF"],
+    ),
+    Package(
         name="vpx",
         source_url="https://github.com/webmproject/libvpx/archive/v1.15.1.tar.gz",
         sha256="6cba661b22a552bad729bd2b52df5f0d57d14b9789219d46d38f73c821d3a990",
@@ -136,6 +138,7 @@ codec_group = [
             "--disable-examples",
             "--disable-tools",
             "--disable-unit-tests",
+            "--disable-dependency-tracking",
         ],
     ),
     Package(
@@ -168,15 +171,7 @@ codec_group = [
         source_url="https://github.com/cisco/openh264/archive/refs/tags/v2.6.0.tar.gz",
         sha256="558544ad358283a7ab2930d69a9ceddf913f4a51ee9bf1bfb9e377322af81a69",
         source_filename="openh264-2.6.0.tar.gz",
-        requires=["meson", "ninja"],
         build_system="meson",
-    ),
-    Package(
-        name="fdk_aac",
-        source_url="https://github.com/mstorsjo/fdk-aac/archive/refs/tags/v2.0.3.tar.gz",
-        sha256="e25671cd96b10bad896aa42ab91a695a9e573395262baed4e4a2ff178d6a3a78",
-        when=When.commercial_only,
-        build_system="cmake",
     ),
     Package(
         name="opencore-amr",
@@ -191,10 +186,9 @@ codec_group = [
         source_url="https://code.videolan.org/videolan/x264/-/archive/32c3b801191522961102d4bea292cdb61068d0dd/x264-32c3b801191522961102d4bea292cdb61068d0dd.tar.bz2",
         sha256="d7748f350127cea138ad97479c385c9a35a6f8527bc6ef7a52236777cf30b839",
         # assembly contains textrels which are not supported by musl
-        build_arguments=["--disable-asm"] if is_musllinux else [],
+        build_arguments=["--disable-cli"] + (["--disable-asm"] if is_musllinux else []),
         # parallel build runs out of memory on Windows
         build_parallel=plat != "Windows",
-        when=When.community_only,
     ),
     Package(
         name="x265",
@@ -202,22 +196,7 @@ codec_group = [
         sha256="a31699c6a89806b74b0151e5e6a7df65de4b49050482fe5ebf8a4379d7af8f29",
         build_system="cmake",
         source_dir="source",
-        when=When.community_only,
     ),
-    # Package(
-    #     name="srt",
-    #     source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
-    #     sha256="d0a8b600fe1b4eaaf6277530e3cfc8f15b8ce4035f16af4a5eb5d4b123640cdd",
-    #     build_system="cmake",
-    #     build_arguments=(
-    #         [r"-DOPENSSL_ROOT_DIR=C:\Program Files\OpenSSL"]
-    #         if plat == "Windows"
-    #         else ["-DENABLE_ENCRYPTION=OFF"]
-    #         if plat == "Darwin"
-    #         else [""]
-    #     ),
-    #     when=When.community_only,
-    # ),
 ]
 
 alsa_package = Package(
@@ -245,7 +224,6 @@ libvpl_package = Package(
     name="libvpl",
     source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.16.0.tar.gz",
     sha256="d60931937426130ddad9f1975c010543f0da99e67edb1c6070656b7947f633b6",
-    requires=["cmake"],
     build_system="cmake",
     build_arguments=[
         "-DINSTALL_LIB=ON",
@@ -305,6 +283,20 @@ def download_tars(packages: list[Package]) -> None:
                 print(f"{name} generated an exception: {exc}")
                 raise
 
+def make_tarball_name() -> str:
+    isArm64 = platform.machine() in {"arm64", "aarch64"}
+
+    if sys.platform.startswith("win"):
+        return "ffmpeg-windows-aarch64" if isArm64 else "ffmpeg-windows-x86_64"
+    elif sys.platform.startswith("linux"):
+        if is_musllinux:
+            return "ffmpeg-musllinux-aarch64" if isArm64 else "ffmpeg-musllinux-x86_64"
+        else:
+            return "ffmpeg-manylinux-aarch64" if isArm64 else "ffmpeg-manylinux-x86_64"
+    elif sys.platform.startswith("darwin"):
+        return "ffmpeg-macos-arm64" if isArm64 else "ffmpeg-macos-x86_64"
+    else:
+        return "ffmpeg-unknown"
 
 def main():
     parser = argparse.ArgumentParser("build-ffmpeg")
@@ -335,8 +327,8 @@ def main():
     output_dir = os.path.abspath("output")
     if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         output_dir = "/output"
-    output_tarball = os.path.join(output_dir, f"ffmpeg-{get_platform()}.tar.gz")
 
+    output_tarball = os.path.join(output_dir, make_tarball_name() + ".tar.gz")
     if os.path.exists(output_tarball):
         return
 
@@ -403,7 +395,6 @@ def main():
         "--enable-libopus",
         "--enable-libspeex",
         "--enable-libsvtav1",
-        # "--enable-libsrt" if community else "--disable-libsrt",
         "--enable-libtwolame",
         "--enable-libvorbis",
         "--enable-libvpx",
@@ -423,9 +414,6 @@ def main():
 
     if use_libvpl:
         ffmpeg_package.build_arguments.append("--enable-libvpl")
-
-    if not community:
-        ffmpeg_package.build_arguments.append("--enable-libfdk_aac")
 
     if plat == "Darwin":
         ffmpeg_package.build_arguments.extend(

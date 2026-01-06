@@ -18,28 +18,6 @@ def fetch(url: str, path: str) -> None:
     run(["curl", "-L", "-o", path, url])
 
 
-def get_platform() -> str:
-    """
-    Get the current platform tag.
-    """
-    system = platform.system()
-    machine = platform.machine()
-    if system == "Linux":
-        if platform.libc_ver()[0] == "glibc":
-            return f"manylinux_{machine}"
-        else:
-            return f"musllinux_{machine}"
-    elif system == "Darwin":
-        return f"macosx_{machine}"
-    elif system == "Windows":
-        if struct.calcsize("P") * 8 == 64:
-            return "win_amd64"
-        else:
-            return "win32"
-    else:
-        raise Exception(f"Unsupported system {system}")
-
-
 @contextlib.contextmanager
 def chdir(path: str) -> Iterator[None]:
     """
@@ -353,9 +331,7 @@ class Builder:
         flags_high_bits = []
 
         disable_sve = platform.system() == "Linux" and platform.machine() == "aarch64"
-        platform_str = get_platform()
-
-        if not ("x86_64" in platform_str or "amd64" in platform_str):
+        if platform.machine() not in {"x86_64", "amd64"}:
             flags_high_bits.append("-DENABLE_ASSEMBLY=0")
             flags_high_bits.append("-DENABLE_ALTIVEC=0")
 
