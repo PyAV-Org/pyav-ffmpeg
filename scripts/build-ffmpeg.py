@@ -21,8 +21,7 @@ def calculate_sha256(filename: str) -> str:
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
-
-library_group = [
+gnutls_group = [
     Package(
         name="gmp",
         source_url="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
@@ -30,18 +29,15 @@ library_group = [
         # out-of-tree builds fail on Windows
         build_dir=".",
     ),
-]
-
-gnutls_group = [
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.gz",
-        sha256="8ea8ccf86c09dd801c8cac19878e804e54f707cf69884371130d20bde68386b7",
+        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz",
+        sha256="12542ad7619470efd95a623174dcd4b364f2483caf708c6bee837cb53a54cb9d",
     ),
     Package(
         name="nettle",
-        source_url="https://ftp.gnu.org/gnu/nettle/nettle-3.10.1.tar.gz",
-        sha256="b0fcdd7fc0cdea6e80dcf1dd85ba794af0d5b4a57e26397eee3bc193272d9132",
+        source_url="https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz",
+        sha256="fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5",
         requires=["gmp"],
         build_arguments=["--disable-documentation"],
         # build randomly fails with "*** missing separator.  Stop."
@@ -49,8 +45,8 @@ gnutls_group = [
     ),
     Package(
         name="gnutls",
-        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz",
-        sha256="69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed",
+        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.11.tar.xz",
+        sha256="91bd23c4a86ebc6152e81303d20cf6ceaeb97bc8f84266d0faec6e29f17baa20",
         requires=["nettle", "unistring"],
         build_arguments=[
             "--disable-cxx",
@@ -340,7 +336,7 @@ def main():
             run(["where", tool])
 
     with log_group("install python packages"):
-        run(["pip", "install", "cmake==3.31.6", "meson", "ninja"])
+        run(["pip", "install", "cmake==3.31.10", "meson", "ninja"])
 
     # build tools
     build_tools = []
@@ -378,7 +374,6 @@ def main():
             else "--disable-mediafoundation"
         ),
         "--enable-version3",
-        "--enable-gmp",
         "--enable-alsa" if use_alsa else "--disable-alsa",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libaom",
@@ -426,7 +421,7 @@ def main():
         ]
     )
 
-    packages = library_group[:]
+    packages = []
     if use_alsa:
         packages += [alsa_package]
     if use_cuda:
