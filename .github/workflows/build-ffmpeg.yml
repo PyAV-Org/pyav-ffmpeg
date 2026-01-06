@@ -83,5 +83,5 @@ jobs:
       - name: Upload FFmpeg
         uses: actions/upload-artifact@v6
         with:
-          name: output-${{ matrix.os }}-${{ matrix.arch }}
+          name: output-${{ matrix.os }}
           path: output/
