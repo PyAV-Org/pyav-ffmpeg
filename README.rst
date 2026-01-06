@@ -7,7 +7,7 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, aarch64) 
+- Linux (x86_64, aarch64)
 - macOS (x86_64, arm64)
 - Windows (x86_64)
 
