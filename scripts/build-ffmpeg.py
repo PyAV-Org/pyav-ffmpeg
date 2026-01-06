@@ -137,8 +137,8 @@ codec_group = [
     ),
     Package(
         name="png",
-        source_url="https://download.sourceforge.net/libpng/libpng-1.6.47.tar.gz",
-        sha256="084115c62fe023e3d88cd78764a4d8e89763985ee4b4a085825f7a00d85eafbb",
+        source_url="https://downloads.sourceforge.net/project/libpng/libpng16/1.6.53/libpng-1.6.53.tar.xz",
+        sha256="1d3fb8ccc2932d04aa3663e22ef5ef490244370f4e568d7850165068778d98d4",
         # avoid an assembler error on Windows
         build_arguments=["PNG_COPTS=-fno-asynchronous-unwind-tables"],
     ),
