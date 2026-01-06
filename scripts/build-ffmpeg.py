@@ -175,8 +175,8 @@ codec_group = [
     ),
     Package(
         name="opencore-amr",
-        source_url="http://deb.debian.org/debian/pool/main/o/opencore-amr/opencore-amr_0.1.5.orig.tar.gz",
-        sha256="2c006cb9d5f651bfb5e60156dbff6af3c9d35c7bbcc9015308c0aff1e14cd341",
+        source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
+        sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
         # parallel build hangs on Windows
         build_parallel=plat != "Windows",
         when=When.community_only,
