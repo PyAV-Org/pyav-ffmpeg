@@ -85,3 +85,42 @@ jobs:
         with:
           name: output-${{ matrix.os }}
           path: output/
+
+  cross-build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-24.04" ]
+        build: [ "manylinux_", "musllinux_" ]
+        # arch: [ "loongarch64", "ppc64le", "riscv64", "s390x" ]
+        arch: [ "ppc64le" ]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: docker/setup-qemu-action@v3
+      - name: Build FFmpeg
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_BEFORE_ALL_LINUX: ./scripts/install-static-clang.sh
+          CIBW_BEFORE_BUILD_LINUX: python scripts/build-ffmpeg.py /tmp/vendor --community
+          CIBW_BUILD: cp311-${{ matrix.build }}${{ matrix.arch }}
+          CIBW_ENVIRONMENT_LINUX: >
+            CC="/opt/clang/bin/clang"
+            CXX="/opt/clang/bin/clang++"
+            LDFLAGS="-fuse-ld=lld"
+          CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_ARCH
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
+          CIBW_TEST_COMMAND: python -c "import dummy"
+        run: |
+          pip install cibuildwheel delvewheel
+          cibuildwheel --output-dir output
+          rm -f output/*.whl
+      - name: Upload FFmpeg
+        uses: actions/upload-artifact@v6
+        with:
+          name: output-${{ matrix.build }}${{ matrix.arch }}
+          path: output/
