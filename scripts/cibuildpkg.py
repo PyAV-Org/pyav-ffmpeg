@@ -226,6 +226,11 @@ class Builder:
                     configure_args += ["--target=x86_64-darwin20-gcc"]
             elif platform.system() == "Windows":
                 configure_args += ["--target=x86_64-win64-gcc"]
+            elif platform.system() == "Linux":
+                if "RUNNER_ARCH" in os.environ:
+                    prepend_env(env, "CFLAGS", "-pthread")
+                    prepend_env(env, "CXXFLAGS", "-pthread")
+                    prepend_env(env, "LDFLAGS", "-pthread")
 
         if package.name == "ffmpeg" and platform.system() == "Windows":
             prepend_env(env, "LDFLAGS", "-LC:/PROGRA~1/OpenSSL/lib")

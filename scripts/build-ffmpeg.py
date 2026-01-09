@@ -274,17 +274,19 @@ def download_tars(packages: list[Package]) -> None:
                 raise
 
 def make_tarball_name() -> str:
-    isArm64 = platform.machine() in {"arm64", "aarch64"}
+    machine = platform.machine().lower()
+    isArm64 = machine in {"arm64", "aarch64"}
 
     if sys.platform.startswith("win"):
         return "ffmpeg-windows-aarch64" if isArm64 else "ffmpeg-windows-x86_64"
-    elif sys.platform.startswith("linux"):
-        if is_musllinux:
-            return "ffmpeg-musllinux-aarch64" if isArm64 else "ffmpeg-musllinux-x86_64"
-        else:
-            return "ffmpeg-manylinux-aarch64" if isArm64 else "ffmpeg-manylinux-x86_64"
+
     elif sys.platform.startswith("darwin"):
         return "ffmpeg-macos-arm64" if isArm64 else "ffmpeg-macos-x86_64"
+
+    elif sys.platform.startswith("linux"):
+        prefix = "ffmpeg-musllinux-" if is_musllinux else "ffmpeg-manylinux-"
+        return prefix + machine
+
     else:
         return "ffmpeg-unknown"
 
@@ -400,6 +402,17 @@ def main():
                 "--enable-videotoolbox",
                 "--enable-audiotoolbox",
                 "--extra-ldflags=-Wl,-ld_classic",
+            ]
+        )
+
+    if plat == "Linux" and "RUNNER_ARCH" in os.environ:
+        ffmpeg_package.build_arguments.extend(
+            [
+                "--enable-cross-compile",
+                "--target-os=linux",
+                "--arch=" + platform.machine().lower(),
+                "--cc=/opt/clang/bin/clang",
+                "--cxx=/opt/clang/bin/clang++",
             ]
         )
 
