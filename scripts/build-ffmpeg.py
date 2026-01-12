@@ -93,19 +93,6 @@ codec_group = [
         requires=["ogg"],
     ),
     Package(
-        name="aom",
-        source_url="https://storage.googleapis.com/aom-releases/libaom-3.13.1.tar.gz",
-        sha256="19e45a5a7192d690565229983dad900e76b513a02306c12053fb9a262cbeca7d",
-        build_system="cmake",
-        build_arguments=[
-            "-DENABLE_DOCS=0",
-            "-DENABLE_EXAMPLES=0",
-            "-DENABLE_TESTS=0",
-            "-DENABLE_TOOLS=0",
-        ],
-        build_parallel=False,
-    ),
-    Package(
         name="dav1d",
         source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.3/dav1d-1.5.3.tar.bz2",
         sha256="e099f53253f6c247580c554d53a13f1040638f2066edc3c740e4c2f15174ce22",
@@ -369,7 +356,6 @@ def main():
         "--enable-version3",
         "--enable-alsa" if use_alsa else "--disable-alsa",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
-        "--enable-libaom",
         "--enable-libdav1d",
         "--enable-libmp3lame",
         "--enable-libopencore-amrnb" if community else "--disable-libopencore-amrnb",
