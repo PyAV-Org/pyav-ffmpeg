@@ -7,7 +7,7 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, aarch64)
+- Linux (x86_64, aarch64, ppc64le)
 - macOS (x86_64, arm64)
 - Windows (x86_64)
 
@@ -21,7 +21,6 @@ Currently FFmpeg 8.0.1 is built with the following packages enabled for all plat
 - opus 1.6
 - speex 1.2.1
 - vorbis 1.3.7
-- aom 3.13.1
 - dav1d 1.5.3
 - libsvtav1 3.1.2
 - vpx 1.15.2
