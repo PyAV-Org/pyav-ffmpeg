@@ -154,8 +154,7 @@ codec_group = [
         name="opencore-amr",
         source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
         sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
-        # parallel build hangs on Windows
-        build_parallel=plat != "Windows",
+        build_arguments=["--disable-dependency-tracking"],
         when=When.community_only,
     ),
     Package(
@@ -164,7 +163,7 @@ codec_group = [
         sha256="6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff224",
         # assembly contains textrels which are not supported by musl
         build_arguments=(
-            "--disable-lsmash --disable-swscale --disable-ffms --enable-strip" + (" --disable-asm" if is_musllinux else "")
+            "--disable-cli --disable-lsmash --disable-swscale --disable-ffms --enable-strip" + (" --disable-asm" if is_musllinux else "")
         ).split(" "),
     ),
     Package(
@@ -216,8 +215,6 @@ ffmpeg_package = Package(
     name="ffmpeg",
     source_url="https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz",
     sha256="05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41",
-    build_arguments=[],
-    build_parallel=plat != "Windows",
 )
 
 
