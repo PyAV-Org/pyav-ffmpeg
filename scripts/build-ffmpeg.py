@@ -40,8 +40,6 @@ gnutls_group = [
         sha256="fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5",
         requires=["gmp"],
         build_arguments=["--disable-documentation"],
-        # build randomly fails with "*** missing separator.  Stop."
-        build_parallel=False,
     ),
     Package(
         name="gnutls",
