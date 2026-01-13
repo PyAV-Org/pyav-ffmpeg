@@ -41,9 +41,6 @@ def main():
         f"Currently FFmpeg {get_version(ffmpeg_package)} is built with the following packages enabled for all platforms:\n"
     )
 
-    for package in sorted(library_group):
-        print(f"- {package.name} {get_version(package)}")
-
     for package in codec_group:
         print(f"- {package.name} {get_version(package)}")
 
