@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import sys
 
-from cibuildpkg import Builder, Package, When, fetch, log_group, run
+from cibuildpkg import Builder, Package, fetch, log_group, run
 
 plat = platform.system()
 is_musllinux = plat == "Linux" and platform.libc_ver()[0] != "glibc"
@@ -155,7 +155,6 @@ codec_group = [
         source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
         sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
         build_arguments=["--disable-dependency-tracking"],
-        when=When.community_only,
     ),
     Package(
         name="x264",
@@ -277,20 +276,12 @@ def make_tarball_name() -> str:
 def main():
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
-    parser.add_argument("--community", action="store_true")
 
     args = parser.parse_args()
-
     dest_dir = os.path.abspath(args.destination)
-    community = args.community
 
-    # Use ALSA only on Linux.
     use_alsa = plat == "Linux"
-
-    # Use CUDA if supported.
     use_cuda = plat in {"Linux", "Windows"}
-
-    # Use AMD AMF if supported.
     use_amf = plat in {"Linux", "Windows"}
 
     # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
@@ -355,8 +346,8 @@ def main():
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libdav1d",
         "--enable-libmp3lame",
-        "--enable-libopencore-amrnb" if community else "--disable-libopencore-amrnb",
-        "--enable-libopencore-amrwb" if community else "--disable-libopencore-amrwb",
+        "--enable-libopencore-amrnb",
+        "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libspeex",
         "--enable-libsvtav1",
@@ -423,18 +414,10 @@ def main():
     packages += codec_group
     packages += [ffmpeg_package]
 
-    filtered_packages = []
-    for package in packages:
-        if package.when == When.community_only and not community:
-            continue
-        if package.when == When.commercial_only and community:
-            continue
-        filtered_packages.append(package)
-
-    download_tars(build_tools + filtered_packages)
+    download_tars(build_tools + packages)
     for tool in build_tools:
         builder.build(tool, for_builder=True)
-    for package in filtered_packages:
+    for package in packages:
         builder.build(package)
 
     if plat == "Windows":
@@ -479,10 +462,8 @@ def main():
     elif plat == "Windows":
         libraries = glob.glob(os.path.join(dest_dir, "bin", "*.dll"))
 
-    # strip libraries
     if plat == "Darwin":
-        run(["strip", "-S"] + libraries)
-        run(["otool", "-L"] + libraries)
+        run(["strip", "-x", "-S"] + libraries)
     else:
         run(["strip", "-s"] + libraries)
 

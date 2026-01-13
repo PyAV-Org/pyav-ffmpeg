@@ -11,7 +11,6 @@ import tempfile
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass, field, replace
-from enum import IntEnum
 
 
 def fetch(url: str, path: str) -> None:
@@ -78,12 +77,6 @@ def run(cmd: list[str], env=None) -> None:
         raise e
 
 
-class When(IntEnum):
-    always = 0
-    community_only = 1
-    commercial_only = 2
-
-
 @dataclass(slots=True)
 class Package:
     name: str
@@ -96,7 +89,6 @@ class Package:
     requires: list[str] = field(default_factory=list)
     source_dir: str = ""
     source_filename: str = ""
-    when: When = When.always
 
     def __lt__(self, other):
         return self.name < other.name
