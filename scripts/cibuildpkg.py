@@ -74,6 +74,13 @@ def run(cmd: list[str], env=None) -> None:
         subprocess.run(cmd, check=True, env=env, stderr=subprocess.PIPE, text=True)
     except subprocess.CalledProcessError as e:
         print(f"stderr: {e.stderr}")
+        # Print config.log tail if it exists (for ffmpeg configure debugging)
+        config_log = os.path.join(os.getcwd(), "ffbuild", "config.log")
+        if os.path.exists(config_log):
+            print(f"\n=== Tail of {config_log} ===")
+            with open(config_log, "r") as f:
+                lines = f.readlines()
+                print("".join(lines[-100:]))
         raise e
 
 
@@ -204,11 +211,17 @@ class Builder:
         env = self._environment(for_builder=for_builder)
         prefix = self._prefix(for_builder=for_builder)
         configure_args = [
-            "--disable-static",
             "--enable-shared",
             "--libdir=" + self._mangle_path(os.path.join(prefix, "lib")),
             "--prefix=" + self._mangle_path(prefix),
         ]
+
+        if package.name == "x264":
+            # Disable asm on Windows ARM64 (no nasm available)
+            if platform.system() == "Windows" and platform.machine().lower() in {"arm64", "aarch64"}:
+                configure_args.append("--disable-asm")
+                # Specify host to ensure correct resource compiler target
+                configure_args.append("--host=aarch64-w64-mingw32")
 
         if package.name == "vpx":
             if platform.system() == "Darwin":
@@ -217,7 +230,12 @@ class Builder:
                 elif platform.machine() == "x86_64":
                     configure_args += ["--target=x86_64-darwin20-gcc"]
             elif platform.system() == "Windows":
-                configure_args += ["--target=x86_64-win64-gcc"]
+                if platform.machine().lower() in {"arm64", "aarch64"}:
+                    configure_args += ["--target=arm64-win64-gcc"]
+                    # Link pthread for ARM64 Windows
+                    prepend_env(env, "LDFLAGS", "-lpthread")
+                else:
+                    configure_args += ["--target=x86_64-win64-gcc"]
             elif platform.system() == "Linux":
                 if "RUNNER_ARCH" in os.environ:
                     prepend_env(env, "CFLAGS", "-pthread")
@@ -229,9 +247,24 @@ class Builder:
             prepend_env(
                 env,
                 "PKG_CONFIG_PATH",
-                "/c/msys64/usr/lib/pkgconfig",
-                separator=":",
+                "C:/msys64/usr/lib/pkgconfig",
+                separator=";",
             )
+            # Debug: print pkg-config info
+            print(f"PKG_CONFIG_PATH: {env.get('PKG_CONFIG_PATH')}")
+            print(f"PKG_CONFIG: {env.get('PKG_CONFIG')}")
+            import glob
+            pc_files = glob.glob(os.path.join(prefix, "lib", "pkgconfig", "*.pc"))
+            print(f"PC files in {prefix}/lib/pkgconfig: {pc_files}")
+            # Test pkgconf directly
+            import subprocess
+            result = subprocess.run(
+                ["pkgconf", "--modversion", "dav1d"],
+                env=env,
+                capture_output=True,
+                text=True
+            )
+            print(f"pkgconf dav1d test: returncode={result.returncode}, stdout={result.stdout}, stderr={result.stderr}")
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)
@@ -419,17 +452,29 @@ class Builder:
         prepend_env(
             env, "LDFLAGS", "-L" + self._mangle_path(os.path.join(prefix, "lib"))
         )
+        # Use ; as separator on Windows, : on Unix
+        # Don't mangle PKG_CONFIG_PATH on Windows - pkgconf expects native paths
+        pkg_config_sep = ";" if platform.system() == "Windows" else ":"
+        pkg_config_path = os.path.join(prefix, "lib", "pkgconfig")
+        if platform.system() != "Windows":
+            pkg_config_path = self._mangle_path(pkg_config_path)
         prepend_env(
             env,
             "PKG_CONFIG_PATH",
-            self._mangle_path(os.path.join(prefix, "lib", "pkgconfig")),
-            separator=":",
+            pkg_config_path,
+            separator=pkg_config_sep,
         )
 
         if platform.system() == "Darwin" and not for_builder:
             arch_flags = os.environ["ARCHFLAGS"]
             for var in ["CFLAGS", "CXXFLAGS", "LDFLAGS"]:
                 prepend_env(env, var, arch_flags)
+
+        if platform.system() == "Windows" and platform.machine().lower() in {"arm64", "aarch64"}:
+            env["CC"] = "clang"
+            env["CXX"] = "clang++"
+            env["RC"] = "llvm-windres"
+            env["WINDRES"] = "llvm-windres"
 
         return env
 

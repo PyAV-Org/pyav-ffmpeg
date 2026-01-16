@@ -278,13 +278,17 @@ def main():
     args = parser.parse_args()
     dest_dir = os.path.abspath(args.destination)
 
+    machine = platform.machine().lower()
+    is_arm = machine in {"arm64", "aarch64"}
+
     use_alsa = plat == "Linux"
-    use_cuda = plat in {"Linux", "Windows"}
-    use_amf = plat in {"Linux", "Windows"}
+    # CUDA, AMF, and Intel VPL are not available on ARM64 Windows
+    use_cuda = plat in {"Linux", "Windows"} and not is_arm
+    use_amf = plat in {"Linux", "Windows"} and not is_arm
 
     # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
     # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
-    use_libvpl = plat in {"Linux", "Windows"}
+    use_libvpl = plat in {"Linux", "Windows"} and not is_arm
 
     # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
@@ -303,11 +307,17 @@ def main():
     # install packages
     available_tools = set()
     if plat == "Windows":
-        available_tools.update(["nasm"])
+        if not is_arm:
+            available_tools.update(["nasm"])
 
         # print tool locations
         print("PATH", os.environ["PATH"])
-        for tool in ["gcc", "g++", "curl", "ld", "nasm", "pkg-config"]:
+        if is_arm:
+            # CLANGARM64 uses clang instead of gcc
+            tools = ["clang", "clang++", "curl", "ld", "pkg-config"]
+        else:
+            tools = ["gcc", "g++", "curl", "ld", "nasm", "pkg-config"]
+        for tool in tools:
             run(["where", tool])
 
     with log_group("install python packages"):
@@ -315,7 +325,7 @@ def main():
 
     # build tools
     build_tools = []
-    if "nasm" not in available_tools and platform.machine() not in {"arm64", "aarch64"}:
+    if "nasm" not in available_tools and platform.machine().lower() not in {"arm64", "aarch64"}:
         build_tools.append(
             Package(
                 name="nasm",
@@ -388,6 +398,15 @@ def main():
             ]
         )
 
+    if plat == "Windows" and is_arm:
+        ffmpeg_package.build_arguments.extend(
+            [
+                "--cc=clang",
+                "--cxx=clang++",
+                "--arch=aarch64",
+            ]
+        )
+
     ffmpeg_package.build_arguments.extend(
         [
             "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd,vorbis",
@@ -411,6 +430,14 @@ def main():
         packages += gnutls_group
     packages += codec_group
     packages += [ffmpeg_package]
+
+    # Disable runtime CPU detection for opus on Windows ARM64
+    # (no CPU detection method available for this platform)
+    if plat == "Windows" and is_arm:
+        for pkg in packages:
+            if pkg.name == "opus":
+                pkg.build_arguments.append("--disable-rtcd")
+                break
 
     download_tars(build_tools + packages)
     for tool in build_tools:
@@ -437,19 +464,33 @@ def main():
                 )
 
         # copy some libraries provided by mingw
+        machine = platform.machine().lower()
+        is_arm64 = machine in {"arm64", "aarch64"}
+        compiler = "clang" if is_arm64 else "gcc"
         mingw_bindir = os.path.dirname(
-            subprocess.run(["where", "gcc"], check=True, stdout=subprocess.PIPE)
+            subprocess.run(["where", compiler], check=True, stdout=subprocess.PIPE)
             .stdout.decode()
             .splitlines()[0]
             .strip()
         )
-        for name in (
-            "libgcc_s_seh-1.dll",
-            "libiconv-2.dll",
-            "libstdc++-6.dll",
-            "libwinpthread-1.dll",
-            "zlib1.dll",
-        ):
+        if is_arm64:
+            # CLANGARM64 uses clang/libc++ instead of gcc/libstdc++
+            dll_names = (
+                "libc++.dll",
+                "libiconv-2.dll",
+                "libunwind.dll",
+                "libwinpthread-1.dll",
+                "zlib1.dll",
+            )
+        else:
+            dll_names = (
+                "libgcc_s_seh-1.dll",
+                "libiconv-2.dll",
+                "libstdc++-6.dll",
+                "libwinpthread-1.dll",
+                "zlib1.dll",
+            )
+        for name in dll_names:
             shutil.copy(os.path.join(mingw_bindir, name), os.path.join(dest_dir, "bin"))
 
     # find libraries
