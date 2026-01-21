@@ -18,7 +18,7 @@ Currently FFmpeg 8.0.1 is built with the following packages enabled for all plat
 
 - lame 3.100
 - ogg 1.3.6
-- opus 1.6
+- opus 1.6.1
 - speex 1.2.1
 - vorbis 1.3.7
 - dav1d 1.5.3

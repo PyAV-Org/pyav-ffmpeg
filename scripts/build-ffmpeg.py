@@ -74,8 +74,8 @@ codec_group = [
     ),
     Package(
         name="opus",
-        source_url="https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.6.tar.gz",
-        sha256="b7637334527201fdfd6dd6a02e67aceffb0e5e60155bbd89175647a80301c92c",
+        source_url="https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.6.1.tar.gz",
+        sha256="6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
         build_arguments=["--disable-doc", "--disable-extra-programs"],
     ),
     Package(
