@@ -12,6 +12,8 @@ on:
       - '**.md'
       - '**.rst'
       - '**.txt'
+  release:
+    types: [published]
   workflow_dispatch:
 jobs:
   build:
@@ -132,3 +134,21 @@ jobs:
         with:
           name: output-${{ matrix.build }}${{ matrix.arch }}
           path: output/
+
+  upload-release:
+    if: github.event_name == 'release'
+    needs: [build, cross-build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: artifacts/
+          pattern: output-*
+          merge-multiple: true
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.tar.gz
