@@ -23,7 +23,7 @@ Currently FFmpeg 8.0.1 is built with the following packages enabled for all plat
 - vorbis 1.3.7
 - dav1d 1.5.3
 - libsvtav1 3.1.2
-- vpx 1.15.2
+- vpx 1.16.0
 - png 1.6.54
 - webp 1.5.0
 - openh264 2.6.0
