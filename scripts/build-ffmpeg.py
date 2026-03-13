@@ -280,11 +280,12 @@ def main():
 
     machine = platform.machine().lower()
     is_arm = machine in {"arm64", "aarch64"}
+    is_riscv = machine in {"riscv64"}
 
     use_alsa = plat == "Linux"
     # CUDA, AMF, and Intel VPL are not available on ARM64 Windows
-    use_cuda = plat in {"Linux", "Windows"} and not is_arm
-    use_amf = plat in {"Linux", "Windows"} and not is_arm
+    use_cuda = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
+    use_amf = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
 
     # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
     # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
