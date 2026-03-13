@@ -321,7 +321,7 @@ def main():
             run(["where", tool])
 
     with log_group("install python packages"):
-        run(["pip", "install", "cmake==3.31.10", "meson", "ninja"])
+        run(["pip", "install", "cmake", "meson", "ninja"])
 
     # build tools
     build_tools = []
