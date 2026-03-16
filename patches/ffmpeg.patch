@@ -1,8 +1,8 @@
 diff --git a/configure b/configure
-index 732de59292..136347a0d2 100755
+index 8f9fb04115..a70c24378d 100755
 --- a/configure
 +++ b/configure
-@@ -1886,8 +1886,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1996,8 +1996,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
      libdvdread
      librubberband
      libvidstab
@@ -11,12 +11,24 @@ index 732de59292..136347a0d2 100755
      libxavs
      libxavs2
      libxvid
-@@ -1900,6 +1898,8 @@ EXTERNAL_LIBRARY_NONFREE_LIST="
+@@ -2010,6 +2008,8 @@ EXTERNAL_LIBRARY_NONFREE_LIST="
  "
-
+ 
  EXTERNAL_LIBRARY_VERSION3_LIST="
 +    libx264
 +    libx265
      gmp
      libaribb24
      liblensfun
+diff --git a/libavutil/riscv/cpu.c b/libavutil/riscv/cpu.c
+index 8cc91625c7..481d63a39f 100644
+--- a/libavutil/riscv/cpu.c
++++ b/libavutil/riscv/cpu.c
+@@ -36,6 +36,7 @@
+ #include <sys/hwprobe.h>
+ #elif HAVE_ASM_HWPROBE_H
+ #include <asm/hwprobe.h>
++#include <asm/unistd.h>
+ #include <sys/syscall.h>
+ #include <unistd.h>
+ 
