@@ -33,7 +33,7 @@ index 6e97304850..582b2d05fe 100644
 +    case 0xe436eb7c:
 +        return AV_PIX_FMT_RGB555;
 +    case 0xe436eb7d:
-+        return AV_PIX_FMT_RGB24;
++        return AV_PIX_FMT_BGR24;
 +    case 0xe436eb7e:
 +        return AV_PIX_FMT_0RGB32;
      }
