@@ -104,7 +104,7 @@ jobs:
       matrix:
         build: [ "manylinux_", "musllinux_" ]
         # arch: [ "loongarch64", "ppc64le", "riscv64", "s390x" ]
-        arch: [ "ppc64le" ]
+        arch: [ "ppc64le", "riscv64" ]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6

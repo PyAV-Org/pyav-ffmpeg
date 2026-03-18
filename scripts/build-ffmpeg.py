@@ -106,9 +106,9 @@ codec_group = [
     ),
     Package(
         name="vpx",
-        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.2.tar.gz",
-        sha256="26fcd3db88045dee380e581862a6ef106f49b74b6396ee95c2993a260b4636aa",
-        source_filename="vpx-1.15.2.tar.gz",
+        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.16.0.tar.gz",
+        sha256="7a479a3c66b9f5d5542a4c6a1b7d3768a983b1e5c14c60a9396edc9b649e015c",
+        source_filename="vpx-1.16.0.tar.gz",
         build_arguments=[
             "--disable-examples",
             "--disable-tools",
@@ -280,11 +280,12 @@ def main():
 
     machine = platform.machine().lower()
     is_arm = machine in {"arm64", "aarch64"}
+    is_riscv = machine in {"riscv64"}
 
     use_alsa = plat == "Linux"
     # CUDA, AMF, and Intel VPL are not available on ARM64 Windows
-    use_cuda = plat in {"Linux", "Windows"} and not is_arm
-    use_amf = plat in {"Linux", "Windows"} and not is_arm
+    use_cuda = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
+    use_amf = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
 
     # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
     # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
@@ -321,7 +322,7 @@ def main():
             run(["where", tool])
 
     with log_group("install python packages"):
-        run(["pip", "install", "cmake==3.31.10", "meson", "ninja"])
+        run(["pip", "install", "cmake", "meson", "ninja"])
 
     # build tools
     build_tools = []
