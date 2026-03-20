@@ -210,8 +210,8 @@ libvpl_package = Package(
 
 ffmpeg_package = Package(
     name="ffmpeg",
-    source_url="https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz",
-    sha256="05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41",
+    source_url="https://ffmpeg.org/releases/ffmpeg-8.1.tar.xz",
+    sha256="b072aed6871998cce9b36e7774033105ca29e33632be5b6347f3206898e0756a",
 )
 
 
@@ -401,11 +401,7 @@ def main():
 
     if plat == "Windows" and is_arm:
         ffmpeg_package.build_arguments.extend(
-            [
-                "--cc=clang",
-                "--cxx=clang++",
-                "--arch=aarch64",
-            ]
+            ["--cc=clang", "--cxx=clang++", "--arch=aarch64"]
         )
 
     ffmpeg_package.build_arguments.extend(
@@ -414,6 +410,7 @@ def main():
             "--disable-decoder=sonic",
             "--disable-libjack",
             "--disable-indev=jack",
+            "--disable-filter=gfxcapture",  # gfxcapture_winrt C++ causes build failure on Win Arm
         ]
     )
 

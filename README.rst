@@ -14,7 +14,7 @@ The builds are provided for several platforms:
 Features
 --------
 
-Currently FFmpeg 8.0.1 is built with the following packages enabled for all platforms:
+Currently FFmpeg 8.1 is built with the following packages enabled for all platforms:
 
 - lame 3.100
 - ogg 1.3.6
