@@ -79,12 +79,6 @@ codec_group = [
         build_arguments=["--disable-doc", "--disable-extra-programs"],
     ),
     Package(
-        name="speex",
-        source_url="http://downloads.xiph.org/releases/speex/speex-1.2.1.tar.gz",
-        sha256="4b44d4f2b38a370a2d98a78329fefc56a0cf93d1c1be70029217baae6628feea",
-        build_arguments=["--disable-binaries"],
-    ),
-    Package(
         name="vorbis",
         source_url="https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.xz",
         sha256="b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b",
@@ -358,7 +352,6 @@ def main():
         "--enable-libopencore-amrnb",
         "--enable-libopencore-amrwb",
         "--enable-libopus",
-        "--enable-libspeex",
         "--enable-libsvtav1",
         "--enable-libvorbis",
         "--enable-libvpx",
