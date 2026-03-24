@@ -49,18 +49,6 @@ def log_group(title: str) -> Iterator[None]:
         print(f"::endgroup::\n{ok_str}", flush=True)
 
 
-def make_args(*, parallel: bool) -> list[str]:
-    """
-    Arguments for GNU make.
-    """
-    args = []
-
-    if parallel:
-        args.append("-j")
-
-    return args
-
-
 def prepend_env(env, name: str, new: str, separator: str = " ") -> None:
     old = env.get(name)
     if old:
@@ -171,7 +159,7 @@ class Builder:
 
         # Build package
         with chdir(package_source_path):
-            make_command = ["make"] + make_args(parallel=package.build_parallel)
+            make_command = ["make", "-j", "4"]
             install_command = ["make", "install"]
 
             # Add PREFIX to both make and install commands
@@ -279,9 +267,7 @@ class Builder:
                 + package.build_arguments,
                 env=env,
             )
-            run(
-                ["make"] + make_args(parallel=package.build_parallel) + ["V=1"], env=env
-            )
+            run(["make", "-j", "4", "V=1"], env=env)
             run(["make", "install"], env=env)
 
     def _build_with_cmake(self, package: Package, for_builder: bool) -> None:
@@ -315,11 +301,7 @@ class Builder:
                 ["cmake", package_source_path] + cmake_args + package.build_arguments,
                 env=env,
             )
-            run(
-                ["cmake", "--build", ".", "--verbose"]
-                + make_args(parallel=package.build_parallel),
-                env=env,
-            )
+            run(["cmake", "--build", ".", "--verbose", "-j", "4"], env=env)
             run(["cmake", "--install", "."], env=env)
 
     def _build_with_meson(self, package: Package, for_builder: bool) -> None:
