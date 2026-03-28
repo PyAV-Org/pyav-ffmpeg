@@ -20,6 +20,34 @@ index 8f9fb04115..a70c24378d 100755
      gmp
      libaribb24
      liblensfun
+diff --git a/libavdevice/dshow.c b/libavdevice/dshow.c
+index 6e97304850..582b2d05fe 100644
+--- a/libavdevice/dshow.c
++++ b/libavdevice/dshow.c
+@@ -76,6 +76,14 @@ static enum AVPixelFormat dshow_pixfmt(DWORD biCompression, WORD biBitCount)
+             case 32:
+                 return AV_PIX_FMT_0RGB32;
+         }
++    case 0xe436eb7b:
++        return AV_PIX_FMT_RGB565;
++    case 0xe436eb7c:
++        return AV_PIX_FMT_RGB555;
++    case 0xe436eb7d:
++        return AV_PIX_FMT_BGR24;
++    case 0xe436eb7e:
++        return AV_PIX_FMT_0RGB32;
+     }
+     return avpriv_pix_fmt_find(PIX_FMT_LIST_RAW, biCompression); // all others
+ }
+@@ -1581,7 +1589,7 @@ dshow_add_device(AVFormatContext *avctx,
+         par->codec_type = AVMEDIA_TYPE_VIDEO;
+         par->width      = fmt_info->width;
+         par->height     = fmt_info->height;
+-        par->codec_tag  = bih->biCompression;
++        par->codec_tag  = fmt_info->pix_fmt == AV_PIX_FMT_NONE ? bih->biCompression : 0;
+         par->format     = fmt_info->pix_fmt;
+         if (bih->biCompression == MKTAG('H', 'D', 'Y', 'C')) {
+             av_log(avctx, AV_LOG_DEBUG, "attempt to use full range for HDYC...\n");
 diff --git a/libavutil/riscv/cpu.c b/libavutil/riscv/cpu.c
 index 8cc91625c7..481d63a39f 100644
 --- a/libavutil/riscv/cpu.c
