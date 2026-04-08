@@ -23,7 +23,7 @@ Currently FFmpeg 8.1 is built with the following packages enabled for all platfo
 - dav1d 1.5.3
 - libsvtav1 4.0.1
 - vpx 1.16.0
-- png 1.6.54
+- png 1.6.56
 - webp 1.5.0
 - openh264 2.6.0
 - opencore-amr 0.1.6
