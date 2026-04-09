@@ -21,7 +21,7 @@ Currently FFmpeg 8.1 is built with the following packages enabled for all platfo
 - opus 1.6.1
 - vorbis 1.3.7
 - dav1d 1.5.3
-- libsvtav1 4.0.1
+- libsvtav1 4.1.0
 - vpx 1.16.0
 - png 1.6.56
 - webp 1.5.0
