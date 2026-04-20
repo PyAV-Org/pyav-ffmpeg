@@ -17,9 +17,7 @@ Features
 Currently FFmpeg 8.1 is built with the following packages enabled for all platforms:
 
 - lame 3.100
-- ogg 1.3.6
 - opus 1.6.1
-- vorbis 1.3.7
 - dav1d 1.5.3
 - libsvtav1 4.1.0
 - vpx 1.16.0
