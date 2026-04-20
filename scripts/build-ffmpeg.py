@@ -68,21 +68,10 @@ codec_group = [
         build_arguments=["--disable-gtktest"],
     ),
     Package(
-        name="ogg",
-        source_url="http://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz",
-        sha256="83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638",
-    ),
-    Package(
         name="opus",
         source_url="https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.6.1.tar.gz",
         sha256="6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
         build_arguments=["--disable-doc", "--disable-extra-programs"],
-    ),
-    Package(
-        name="vorbis",
-        source_url="https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.xz",
-        sha256="b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b",
-        requires=["ogg"],
     ),
     Package(
         name="dav1d",
@@ -308,7 +297,6 @@ def main():
         # print tool locations
         print("PATH", os.environ["PATH"])
         if is_arm:
-            # CLANGARM64 uses clang instead of gcc
             tools = ["clang", "clang++", "curl", "ld", "pkg-config"]
         else:
             tools = ["gcc", "g++", "curl", "ld", "nasm", "pkg-config"]
@@ -353,7 +341,6 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libsvtav1",
-        "--enable-libvorbis",
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libopenh264",
