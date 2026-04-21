@@ -27,6 +27,7 @@ Currently FFmpeg 8.1 is built with the following packages enabled for all platfo
 - opencore-amr 0.1.6
 - x264 32c3b801191522961102d4bea292cdb61068d0dd
 - x265 4.2
+- srt 1.5.4
 
 The following additional packages are also enabled on Linux:
 

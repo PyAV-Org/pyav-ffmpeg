@@ -153,6 +153,18 @@ codec_group = [
         build_system="cmake",
         source_dir="source",
     ),
+    Package(
+        name="srt",
+        source_url="https://github.com/Haivision/srt/archive/refs/tags/v1.5.4.tar.gz",
+        sha256="d0a8b600fe1b4eaaf6277530e3cfc8f15b8ce4035f16af4a5eb5d4b123640cdd",
+        source_filename="srt-1.5.4.tar.gz",
+        build_system="cmake",
+        build_arguments=[
+            "-DENABLE_APPS=OFF",
+            "-DENABLE_SHARED=ON",
+            "-DUSE_ENCLIB=openssl",
+        ],
+    ),
 ]
 
 alsa_package = Package(
@@ -346,6 +358,7 @@ def main():
         "--enable-libopenh264",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-zlib",
+        "--enable-libsrt",
         "--enable-libx264",
         "--enable-libx265",
     ]
@@ -455,15 +468,19 @@ def main():
             # CLANGARM64 uses clang/libc++ instead of gcc/libstdc++
             dll_names = (
                 "libc++.dll",
+                "libcrypto-3.dll",
                 "libiconv-2.dll",
+                "libssl-3.dll",
                 "libunwind.dll",
                 "libwinpthread-1.dll",
                 "zlib1.dll",
             )
         else:
             dll_names = (
+                "libcrypto-3-x64.dll",
                 "libgcc_s_seh-1.dll",
                 "libiconv-2.dll",
+                "libssl-3-x64.dll",
                 "libstdc++-6.dll",
                 "libwinpthread-1.dll",
                 "zlib1.dll",

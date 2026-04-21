@@ -294,6 +294,13 @@ class Builder:
             else:
                 run(["apk", "add", "openssl-dev"])
 
+        if package.name == "srt" and platform.system() == "Darwin":
+            openssl_prefix = subprocess.run(
+                ["brew", "--prefix", "openssl@3"],
+                check=True, stdout=subprocess.PIPE, text=True
+            ).stdout.strip()
+            cmake_args.append(f"-DOPENSSL_ROOT_DIR={openssl_prefix}")
+
         # build package
         os.makedirs(package_build_path, exist_ok=True)
         with chdir(package_build_path):
