@@ -1,12 +1,14 @@
 import argparse
 import concurrent.futures
 import glob
+import gzip
 import hashlib
 import os
 import platform
 import shutil
 import subprocess
 import sys
+import tarfile
 
 from cibuildpkg import Builder, Package, fetch, log_group, run
 
@@ -484,9 +486,30 @@ def main():
     else:
         run(["strip", "-s"] + libraries)
 
-    # build output tarball
+    # build output tarball (reproducible: fixed timestamps, sorted entries)
     os.makedirs(output_dir, exist_ok=True)
-    run(["tar", "czvf", output_tarball, "-C", dest_dir, "bin", "include", "lib"])
+    with gzip.GzipFile(output_tarball, "wb", mtime=0) as gz:
+        with tarfile.open(fileobj=gz, mode="w|") as tar:
+            for subdir in ("bin", "include", "lib"):
+                subdir_path = os.path.join(dest_dir, subdir)
+                if not os.path.exists(subdir_path):
+                    continue
+                for root, dirs, files in os.walk(subdir_path):
+                    dirs.sort()
+                    for name in sorted(files):
+                        filepath = os.path.join(root, name)
+                        arcname = os.path.relpath(filepath, dest_dir)
+                        info = tar.gettarinfo(filepath, arcname=arcname)
+                        info.mtime = 0
+                        info.uid = 0
+                        info.gid = 0
+                        info.uname = ""
+                        info.gname = ""
+                        if info.issym() or info.islnk():
+                            tar.addfile(info)
+                        else:
+                            with open(filepath, "rb") as f:
+                                tar.addfile(info, f)
 
 
 if __name__ == "__main__":
