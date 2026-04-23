@@ -16,6 +16,52 @@ plat = platform.system()
 is_musllinux = plat == "Linux" and platform.libc_ver()[0] != "glibc"
 
 
+def make_archive_deterministic(path: str) -> None:
+    """Zero mtime/uid/gid in every ar member header to make the archive reproducible.
+
+    Static archives (.a files) embed the file modification time (and uid/gid) of
+    each member in a 60-byte header.  Tools like ar(1), libtool -static, and ar -M
+    do not always produce deterministic timestamps even when SOURCE_DATE_EPOCH is set
+    or the -D flag is requested, especially in custom CMake commands (e.g. x265's
+    multi-lib merge).  Zeroing these fields in-place is the safest cross-platform fix.
+    """
+    MAGIC = b"!<arch>\n"
+    HEADER_SIZE = 60
+    with open(path, "r+b") as f:
+        if f.read(len(MAGIC)) != MAGIC:
+            return
+        while True:
+            pos = f.tell()
+            header = f.read(HEADER_SIZE)
+            if len(header) < HEADER_SIZE:
+                break
+            if header[58:60] != b"`\n":
+                break  # not a valid ar member header
+            try:
+                size = int(header[48:58].decode().strip())
+            except ValueError:
+                break
+            # ar member header layout (60 bytes):
+            #   [0:16]  name          16 bytes
+            #   [16:28] mtime         12 bytes  ← zero this
+            #   [28:34] uid            6 bytes  ← zero this
+            #   [34:40] gid            6 bytes  ← zero this
+            #   [40:48] mode           8 bytes
+            #   [48:58] size          10 bytes
+            #   [58:60] end magic      2 bytes  (`\n)
+            patched = (
+                header[:16]
+                + b"0           "  # mtime: 12 bytes
+                + b"0     "        # uid:    6 bytes
+                + b"0     "        # gid:    6 bytes
+                + header[40:]      # mode + size + end magic unchanged
+            )
+            f.seek(pos)
+            f.write(patched)
+            # advance past member data; ar pads to even offset
+            f.seek(size + (size % 2), 1)
+
+
 def calculate_sha256(filename: str) -> str:
     sha256_hash = hashlib.sha256()
     with open(filename, "rb") as f:
@@ -477,6 +523,9 @@ def main():
         run(["strip", "-x", "-S"] + libraries)
     else:
         run(["strip", "-s"] + libraries)
+
+    for lib in glob.glob(os.path.join(dest_dir, "lib", "*.a")):
+        make_archive_deterministic(lib)
 
     # build output tarball (reproducible: fixed timestamps, sorted entries)
     os.makedirs(output_dir, exist_ok=True)

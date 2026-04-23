@@ -285,6 +285,7 @@ class Builder:
             "-DCMAKE_INSTALL_LIBDIR=lib",
             "-DCMAKE_INSTALL_PREFIX=" + prefix,
         ]
+
         if platform.system() == "Darwin":
             cmake_args.append("-DCMAKE_INSTALL_NAME_DIR=" + os.path.join(prefix, "lib"))
 
