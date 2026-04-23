@@ -127,13 +127,6 @@ codec_group = [
         ],
     ),
     Package(
-        name="openh264",
-        source_url="https://github.com/cisco/openh264/archive/refs/tags/v2.6.0.tar.gz",
-        sha256="558544ad358283a7ab2930d69a9ceddf913f4a51ee9bf1bfb9e377322af81a69",
-        source_filename="openh264-2.6.0.tar.gz",
-        build_system="meson",
-    ),
-    Package(
         name="opencore-amr",
         source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
         sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
@@ -345,7 +338,6 @@ def main():
         "--enable-libsvtav1",
         "--enable-libvpx",
         "--enable-libwebp",
-        "--enable-libopenh264",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-zlib",
         "--enable-libx264",
@@ -490,7 +482,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     with gzip.GzipFile(output_tarball, "wb", mtime=0) as gz:
         with tarfile.open(fileobj=gz, mode="w|") as tar:
-            for subdir in ("bin", "include", "lib"):
+            for subdir in ("include", "lib"):
                 subdir_path = os.path.join(dest_dir, subdir)
                 if not os.path.exists(subdir_path):
                     continue

@@ -428,6 +428,9 @@ class Builder:
     def _environment(self, *, for_builder: bool) -> dict[str, str]:
         env = os.environ.copy()
 
+        # Reproducible builds: zero out embedded timestamps from __DATE__/__TIME__
+        env.setdefault("SOURCE_DATE_EPOCH", "0")
+
         prefix = self._prefix(for_builder=for_builder)
         prepend_env(
             env, "CPPFLAGS", "-I" + self._mangle_path(os.path.join(prefix, "include"))
@@ -435,6 +438,16 @@ class Builder:
         prepend_env(
             env, "LDFLAGS", "-L" + self._mangle_path(os.path.join(prefix, "lib"))
         )
+
+        # Reproducible builds: suppress non-deterministic linker metadata
+        if platform.system() == "Darwin":
+            # ld64 (Xcode 15+) generates a random UUID (LC_UUID) by default.
+            # -reproducible makes it a deterministic content-hash instead.
+            prepend_env(env, "LDFLAGS", "-Wl,-reproducible")
+        elif platform.system() == "Linux":
+            # GNU ld embeds a random build-id (.note.gnu.build-id) by default;
+            # strip -s does not remove it
+            prepend_env(env, "LDFLAGS", "-Wl,--build-id=none")
         # Use ; as separator on Windows, : on Unix
         # Don't mangle PKG_CONFIG_PATH on Windows - pkgconf expects native paths
         pkg_config_sep = ";" if platform.system() == "Windows" else ":"
