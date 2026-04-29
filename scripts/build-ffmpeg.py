@@ -426,7 +426,7 @@ def main():
 
     ffmpeg_package.build_arguments.extend(
         [
-            "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd,vorbis",
+            "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd",
             "--disable-decoder=sonic",
             "--disable-libjack",
             "--disable-indev=jack",
