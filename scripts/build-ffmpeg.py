@@ -156,9 +156,9 @@ codec_group = [
     ),
     Package(
         name="webp",
-        source_url="https://github.com/webmproject/libwebp/archive/refs/tags/v1.5.0.tar.gz",
-        sha256="668c9aba45565e24c27e17f7aaf7060a399f7f31dba6c97a044e1feacb930f37",
-        source_filename="webp-1.5.0.tar.gz",
+        source_url="https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz",
+        sha256="93a852c2b3efafee3723efd4636de855b46f9fe1efddd607e1f42f60fc8f2136",
+        source_filename="webp-1.6.0.tar.gz",
         build_system="cmake",
         build_arguments=[
             "-DWEBP_BUILD_ANIM_UTILS=OFF",
