@@ -79,8 +79,8 @@ gnutls_group = [
     ),
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz",
-        sha256="12542ad7619470efd95a623174dcd4b364f2483caf708c6bee837cb53a54cb9d",
+        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.gz",
+        sha256="e82664b170064e62331962126b259d452d53b227bb4a93ab20040d846fec01d8",
     ),
     Package(
         name="nettle",
@@ -91,8 +91,8 @@ gnutls_group = [
     ),
     Package(
         name="gnutls",
-        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.11.tar.xz",
-        sha256="91bd23c4a86ebc6152e81303d20cf6ceaeb97bc8f84266d0faec6e29f17baa20",
+        source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz",
+        sha256="ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e",
         requires=["nettle", "unistring"],
         build_arguments=[
             "--disable-cxx",
