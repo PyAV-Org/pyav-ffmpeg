@@ -29,8 +29,8 @@ Currently FFmpeg 8.1 is built with the following packages enabled for all platfo
 
 The following additional packages are also enabled on Linux:
 
-- gnutls 3.8.11
+- gnutls 3.8.13
 - nettle 3.10.2
-- unistring 1.4.1
+- unistring 1.4.2
 
 .. _PyAV: https://github.com/PyAV-Org/PyAV
