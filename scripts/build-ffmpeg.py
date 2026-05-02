@@ -529,15 +529,20 @@ def main():
 
     # build output tarball (reproducible: fixed timestamps, sorted entries)
     os.makedirs(output_dir, exist_ok=True)
+    subdirs = ["include", "lib"]
+    if plat == "Windows":
+        subdirs.append("bin")
     with gzip.GzipFile(output_tarball, "wb", mtime=0) as gz:
         with tarfile.open(fileobj=gz, mode="w|") as tar:
-            for subdir in ("include", "lib"):
+            for subdir in subdirs:
                 subdir_path = os.path.join(dest_dir, subdir)
                 if not os.path.exists(subdir_path):
                     continue
                 for root, dirs, files in os.walk(subdir_path):
                     dirs.sort()
                     for name in sorted(files):
+                        if subdir == "bin" and not name.endswith(".dll"):
+                            continue
                         filepath = os.path.join(root, name)
                         arcname = os.path.relpath(filepath, dest_dir)
                         info = tar.gettarinfo(filepath, arcname=arcname)
