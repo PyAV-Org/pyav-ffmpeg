@@ -16,7 +16,32 @@ on:
     types: [published]
   workflow_dispatch:
 jobs:
+  fan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Make cache file
+        run: python scripts/cache.py
+      - name: Cache tarballs
+        id: cache-tarballs
+        uses: actions/cache@v4
+        with:
+          path: source
+          key: tarballs-${{ hashFiles('cache.txt') }}
+      - name: Grab
+        if: steps.cache-tarballs.outputs.cache-hit != 'true'
+        run: python scripts/grab.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: deps
+          path: source/*
+          if-no-files-found: error
   build:
+    needs: fan
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,6 +77,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
+      - name: Get sources
+        uses: actions/download-artifact@v8
+        with:
+          name: deps
+          path: source
       - name: Set deployment target
         if: runner.os == 'macOS'
         run: |
@@ -97,6 +127,7 @@ jobs:
           path: output/
 
   cross-build:
+    needs: fan
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -109,6 +140,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
+      - name: Get sources
+        uses: actions/download-artifact@v8
+        with:
+          name: deps
+          path: source
       - uses: docker/setup-qemu-action@v3
       - name: Build FFmpeg
         env:

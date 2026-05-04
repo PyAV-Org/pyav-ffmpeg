@@ -12,6 +12,7 @@ import time
 from collections.abc import Iterator
 from dataclasses import dataclass, field, replace
 
+from pkg import *
 
 def fetch(url: str, path: str) -> None:
     run(["curl", "-L", "-o", path, url])
@@ -72,21 +73,6 @@ def run(cmd: list[str], env=None) -> None:
         raise e
 
 
-@dataclass(slots=True)
-class Package:
-    name: str
-    source_url: str
-    sha256: str
-    build_system: str = "autoconf"
-    build_arguments: list[str] = field(default_factory=list)
-    build_dir: str = "build"
-    build_parallel: bool = True
-    requires: list[str] = field(default_factory=list)
-    source_dir: str = ""
-    source_filename: str = ""
-
-    def __lt__(self, other):
-        return self.name < other.name
 
 
 class Builder:
@@ -110,7 +96,7 @@ class Builder:
         with log_group(f"build {package.name}"):
             self._extract(package)
             if package.name == "x265":
-                self._build_x265(package, for_builder=for_builder)
+                self._build_x265(package)
             elif package.build_system == "cmake":
                 self._build_with_cmake(package, for_builder=for_builder)
             elif package.build_system == "meson":
@@ -326,7 +312,7 @@ class Builder:
             run(["ninja", "--verbose"], env=env)
             run(["ninja", "install"], env=env)
 
-    def _build_x265(self, package: Package, for_builder: bool) -> None:
+    def _build_x265(self, package: Package) -> None:
         assert package.name == "x265"
         assert len(package.build_arguments) == 0
 
@@ -365,7 +351,7 @@ class Builder:
                 *flags_high_bits,
             ],
         )
-        self._build_with_cmake(package=x265_12bits, for_builder=for_builder)
+        self._build_with_cmake(package=x265_12bits, for_builder=False)
 
         x265_10bits = replace(
             package,
@@ -379,7 +365,7 @@ class Builder:
                 *flags_high_bits,
             ],
         )
-        self._build_with_cmake(package=x265_10bits, for_builder=for_builder)
+        self._build_with_cmake(package=x265_10bits, for_builder=False)
 
         package_path = os.path.join(self.build_dir, package.name)
         with chdir(os.path.join(package_path, x265_12bits.build_dir)):
@@ -393,7 +379,7 @@ class Builder:
             "-DLINKED_12BIT=1",
             "-DEXTRA_LINK_FLAGS=-L../x265-10bits -L../x265-12bits",
         ] + (["-DENABLE_SVE2=OFF"] if disable_sve else [])
-        self._build_with_cmake(package=package, for_builder=for_builder)
+        self._build_with_cmake(package=package, for_builder=False)
 
     def _extract(self, package: Package) -> None:
         path = os.path.join(self.build_dir, package.name)
