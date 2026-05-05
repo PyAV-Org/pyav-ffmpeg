@@ -145,7 +145,7 @@ jobs:
         with:
           name: deps
           path: source
-      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-qemu-action@v4
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
