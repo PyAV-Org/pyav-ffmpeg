@@ -207,7 +207,7 @@ def main():
     )
 
     packages = []
-    if plat != "Darwin" and "nasm" not in available_tools and machine not in {"arm64", "aarch64"}:
+    if plat != "Darwin" and "nasm" not in available_tools and machine in {"x86_64", "amd64", "i686", "i386"}:
         packages.append(nasm_package)
     if use_alsa:
         packages += [alsa_package]
