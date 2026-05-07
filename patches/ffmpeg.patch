@@ -20,14 +20,3 @@ index 8f9fb04115..a70c24378d 100755
      gmp
      libaribb24
      liblensfun
-diff --git a/libavutil/riscv/cpu.c b/libavutil/riscv/cpu.c
-index 8cc91625c7..481d63a39f 100644
---- a/libavutil/riscv/cpu.c
-+++ b/libavutil/riscv/cpu.c
-@@ -36,6 +36,7 @@
- #include <sys/hwprobe.h>
- #elif HAVE_ASM_HWPROBE_H
- #include <asm/hwprobe.h>
-+#include <asm/unistd.h>
- #include <sys/syscall.h>
- #include <unistd.h>
