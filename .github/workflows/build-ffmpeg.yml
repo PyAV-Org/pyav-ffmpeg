@@ -27,7 +27,7 @@ jobs:
         run: python scripts/cache.py
       - name: Cache tarballs
         id: cache-tarballs
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: source
           key: tarballs-${{ hashFiles('cache.txt') }}
@@ -165,7 +165,7 @@ jobs:
           cibuildwheel --output-dir output
           rm -f output/*.whl
       - name: Upload FFmpeg
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: output-${{ matrix.build }}${{ matrix.arch }}
           path: output/
@@ -178,12 +178,12 @@ jobs:
       contents: write
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           path: artifacts/
           pattern: output-*
           merge-multiple: true
       - name: Upload to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: artifacts/*.tar.gz
