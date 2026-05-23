@@ -135,7 +135,7 @@ codec_group = [
         sha256="6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff224",
         # assembly contains textrels which are not supported by musl
         build_arguments=(
-            "--disable-cli --disable-lsmash --disable-swscale --disable-ffms --enable-strip" + (" --disable-asm" if is_musllinux else "")
+            "--disable-cli --disable-lsmash --disable-swscale --disable-ffms --disable-opencl --enable-strip" + (" --disable-asm" if is_musllinux else "")
         ).split(" "),
     ),
     Package(
