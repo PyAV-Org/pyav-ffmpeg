@@ -51,7 +51,7 @@ esac
 case "${AUDITWHEEL_POLICY}-${AUDITWHEEL_ARCH}" in
 	*-riscv64) M_ARCH="-march=rv64gc";;
 	*-x86_64) M_ARCH="-march=x86-64";;
-	*-armv7l) M_ARCH="-march=armv7a";;
+	*-armv7l) M_ARCH="-march=armv7-a -mfpu=neon-vfpv3 -mfloat-abi=hard";;
 	manylinux*-i686) M_ARCH="-march=k8 -mtune=generic";;  # same as gcc manylinux2014 / manylinux_2_28
 	musllinux*-i686) M_ARCH="-march=pentium-m -mtune=generic";;  # same as gcc musllinux_1_2
 esac
