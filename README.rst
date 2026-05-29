@@ -7,7 +7,7 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, aarch64, ppc64le, riscv64)
+- Linux (x86_64, aarch64, armv7l, ppc64le, riscv64)
 - macOS (x86_64, arm64)
 - Windows (x86_64, aarch64)
 
@@ -24,8 +24,8 @@ Currently FFmpeg 8.1.1 is built with the following packages enabled for all plat
 - png 1.6.58
 - webp 1.6.0
 - opencore-amr 0.1.6
-- x264 32c3b801191522961102d4bea292cdb61068d0dd
-- x265 4.2
+- x264 32c3b801191522961102d4bea292cdb61068d0dd (except armv7l)
+- x265 4.2 (except armv7l)
 
 The following additional packages are also enabled on Linux:
 

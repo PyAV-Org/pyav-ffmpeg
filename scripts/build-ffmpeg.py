@@ -86,7 +86,8 @@ def main():
     dest_dir = os.path.abspath(args.destination)
 
     machine = platform.machine().lower()
-    is_arm = machine in {"arm64", "aarch64"}
+    is_arm32 = machine in {"armv7l", "armv8l", "arm"}
+    is_arm = machine in {"arm64", "aarch64"} or is_arm32
     is_riscv = machine in {"riscv64"}
 
     use_alsa = plat == "Linux"
@@ -158,9 +159,13 @@ def main():
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
         "--enable-zlib",
-        "--enable-libx264",
-        "--enable-libx265",
     ]
+
+    # x264/x265 are skipped on 32-bit ARM (armv7)
+    if not is_arm32:
+        ffmpeg_package.build_arguments.extend(
+            ["--enable-libx264", "--enable-libx265"]
+        )
 
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
@@ -181,11 +186,13 @@ def main():
         )
 
     if plat == "Linux" and "RUNNER_ARCH" in os.environ:
+        # FFmpeg expects "arm" for 32-bit ARM, not the uname "armv7l".
+        ff_arch = "arm" if is_arm32 else machine
         ffmpeg_package.build_arguments.extend(
             [
                 "--enable-cross-compile",
                 "--target-os=linux",
-                "--arch=" + machine,
+                "--arch=" + ff_arch,
                 "--cc=/opt/clang/bin/clang",
                 "--cxx=/opt/clang/bin/clang++",
             ]
@@ -220,7 +227,11 @@ def main():
 
     if use_gnutls:
         packages += gnutls_group
-    packages += codec_group
+    if is_arm32:
+        # x264/x265 are not built on 32-bit ARM (armv7)
+        packages += [p for p in codec_group if p.name not in {"x264", "x265"}]
+    else:
+        packages += codec_group
     packages += [ffmpeg_package]
 
     # Disable runtime CPU detection for opus on Windows ARM64
