@@ -73,7 +73,11 @@ def make_tarball_name() -> str:
 
     elif sys.platform.startswith("linux"):
         prefix = "ffmpeg-musllinux-" if is_musllinux else "ffmpeg-manylinux-"
-        return prefix + machine
+        # Inside the manylinux/musllinux container AUDITWHEEL_ARCH is the
+        # canonical wheel arch. uname (platform.machine) is unreliable when
+        # cross-building 32-bit ARM under an aarch64 kernel, where it reports
+        # "armv8l" rather than "armv7l".
+        return prefix + os.environ.get("AUDITWHEEL_ARCH", machine)
 
     else:
         return "ffmpeg-unknown"
