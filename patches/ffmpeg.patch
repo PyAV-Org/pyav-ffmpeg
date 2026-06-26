@@ -31,3 +31,71 @@ index 8cc91625c7..481d63a39f 100644
 +#include <asm/unistd.h>
  #include <sys/syscall.h>
  #include <unistd.h>
+ 
+diff --git a/libavdevice/dshow.c b/libavdevice/dshow.c
+index 6e97304..6a55584 100644
+--- a/libavdevice/dshow.c
++++ b/libavdevice/dshow.c
+@@ -56,6 +56,10 @@
+ #   define AMCONTROL_COLORINFO_PRESENT 0x00000080 // if set, indicates DXVA color info is present in the upper (24) bits of the dwControlFlags
+ #endif
+ 
++#define DSHOW_MEDIASUBTYPE_RGB565 0xe436eb7b
++#define DSHOW_MEDIASUBTYPE_RGB555 0xe436eb7c
++#define DSHOW_MEDIASUBTYPE_RGB24  0xe436eb7d
++#define DSHOW_MEDIASUBTYPE_RGB32  0xe436eb7e
+ 
+ static enum AVPixelFormat dshow_pixfmt(DWORD biCompression, WORD biBitCount)
+ {
+@@ -76,10 +80,33 @@ static enum AVPixelFormat dshow_pixfmt(DWORD biCompression, WORD biBitCount)
+             case 32:
+                 return AV_PIX_FMT_0RGB32;
+         }
++    case DSHOW_MEDIASUBTYPE_RGB565:
++        return AV_PIX_FMT_RGB565;
++    case DSHOW_MEDIASUBTYPE_RGB555:
++        return AV_PIX_FMT_RGB555;
++    case DSHOW_MEDIASUBTYPE_RGB24:
++        return AV_PIX_FMT_BGR24;
++    case DSHOW_MEDIASUBTYPE_RGB32:
++        return AV_PIX_FMT_0RGB32;
+     }
+     return avpriv_pix_fmt_find(PIX_FMT_LIST_RAW, biCompression); // all others
+ }
+ 
++static int dshow_is_bottomup_rgb(DWORD biCompression)
++{
++    switch (biCompression) {
++    case BI_RGB:
++    case BI_BITFIELDS:
++    case DSHOW_MEDIASUBTYPE_RGB565:
++    case DSHOW_MEDIASUBTYPE_RGB555:
++    case DSHOW_MEDIASUBTYPE_RGB24:
++    case DSHOW_MEDIASUBTYPE_RGB32:
++        return 1;
++    default:
++        return 0;
++    }
++}
++
+ static enum AVColorRange dshow_color_range(DXVA2_ExtendedFormat *fmt_info)
+ {
+     switch (fmt_info->NominalRange)
+@@ -1581,7 +1608,7 @@ dshow_add_device(AVFormatContext *avctx,
+         par->codec_type = AVMEDIA_TYPE_VIDEO;
+         par->width      = fmt_info->width;
+         par->height     = fmt_info->height;
+-        par->codec_tag  = bih->biCompression;
++        par->codec_tag  = fmt_info->pix_fmt == AV_PIX_FMT_NONE ? bih->biCompression : 0;
+         par->format     = fmt_info->pix_fmt;
+         if (bih->biCompression == MKTAG('H', 'D', 'Y', 'C')) {
+             av_log(avctx, AV_LOG_DEBUG, "attempt to use full range for HDYC...\n");
+@@ -1594,7 +1621,7 @@ dshow_add_device(AVFormatContext *avctx,
+         par->chroma_location = fmt_info->chroma_loc;
+         par->codec_id = fmt_info->codec_id;
+         if (par->codec_id == AV_CODEC_ID_RAWVIDEO) {
+-            if (bih->biCompression == BI_RGB || bih->biCompression == BI_BITFIELDS) {
++            if (dshow_is_bottomup_rgb(bih->biCompression)) {
+                 par->bits_per_coded_sample = bih->biBitCount;
+                 if (par->height < 0) {
+                     par->height *= -1;
