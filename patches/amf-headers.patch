@@ -1,6 +1,6 @@
-diff -crB --new-file amf-headers-v1.5.0/amf.pc.in amf-headers-v1.5.0_patched/amf.pc.in
-*** amf-headers-v1.5.0/amf.pc.in	1970-01-01 00:00:00.000000000 +0000
---- amf-headers-v1.5.0_patched/amf.pc.in	2025-11-11 06:48:00.181040000 +0000
+diff -crB --new-file amf-headers-v1.5.2/amf.pc.in amf-headers-v1.5.2_patched/amf.pc.in
+*** amf-headers-v1.5.2/amf.pc.in	1970-01-01 00:00:00.000000000 +0000
+--- amf-headers-v1.5.2_patched/amf.pc.in	2025-11-11 06:48:00.181040000 +0000
 ***************
 *** 0 ****
 --- 1,7 ----
@@ -9,11 +9,11 @@ diff -crB --new-file amf-headers-v1.5.0/amf.pc.in amf-headers-v1.5.0_patched/amf
 + 
 + Name: amf
 + Description: The version of Advanced Media Framework (AMF) SDK headers
-+ Version: 1.5.0
++ Version: 1.5.2
 + Cflags: -I${includedir}
-diff -crB --new-file amf-headers-v1.5.0/Makefile amf-headers-v1.5.0_patched/Makefile
-*** amf-headers-v1.5.0/Makefile	1970-01-01 00:00:00.000000000 +0000
---- amf-headers-v1.5.0_patched/Makefile	2025-11-11 07:34:38.261171572 +0000
+diff -crB --new-file amf-headers-v1.5.2/Makefile amf-headers-v1.5.2_patched/Makefile
+*** amf-headers-v1.5.2/Makefile	1970-01-01 00:00:00.000000000 +0000
+--- amf-headers-v1.5.2_patched/Makefile	2025-11-11 07:34:38.261171572 +0000
 ***************
 *** 0 ****
 --- 1,25 ----

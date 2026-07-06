@@ -163,8 +163,8 @@ nvheaders_package = Package(
 
 amfheaders_package = Package(
     name="amf-headers",
-    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.0/AMF-headers-v1.5.0.tar.gz",
-    sha256="d569647fa26f289affe81a206259fa92f819d06db1e80cc334559953e82a3f01",
+    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.2/AMF-headers-v1.5.2.tar.gz",
+    sha256="d3c12eb324edf05e214608b6a395a51dd95770ed9d45520185d6c3a206811c99",
     build_system="make",
 )
 
