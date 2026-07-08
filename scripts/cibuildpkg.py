@@ -95,7 +95,9 @@ class Builder:
 
         with log_group(f"build {package.name}"):
             self._extract(package)
-            if package.name == "x265":
+            if package.name == "lamer":
+                self._build_lame(package, for_builder=for_builder)
+            elif package.name == "x265":
                 self._build_x265(package)
             elif package.build_system == "cmake":
                 self._build_with_cmake(package, for_builder=for_builder)
@@ -160,6 +162,37 @@ class Builder:
             # Run build and install
             run(make_command, env=env)
             run(install_command, env=env)
+
+    def _build_lame(self, package: Package, for_builder: bool) -> None:
+        # basswood-io/lamer builds libmp3lame with a plain Makefile. Build only
+        # the static encoder library (the `lib` target, not the ncurses CLI
+        # frontend or mpglib decoder) as position-independent code -- it is
+        # linked into the shared libavcodec -- then install it where FFmpeg's
+        # configure looks (-lmp3lame, <lame/lame.h>).
+        package_source_path = os.path.join(
+            self.build_dir, package.name, package.source_dir
+        )
+        env = self._environment(for_builder=for_builder)
+        prefix = self._prefix(for_builder=for_builder)
+
+        make_vars = ["DECODER=0"]
+        if platform.system() == "Windows":
+            # The CLANGARM64 toolchain ships llvm-ar/llvm-ranlib, not ar/ranlib.
+            if platform.machine().lower() in {"arm64", "aarch64"}:
+                env.setdefault("AR", "llvm-ar")
+                env.setdefault("RANLIB", "llvm-ranlib")
+            else:
+                env.setdefault("CC", "gcc")
+        else:
+            # -fPIC is required to link the static archive into libavcodec.so.
+            make_vars.append("PIC=1")
+
+        with chdir(package_source_path):
+            run(["make", "-j", "4", "lib", *make_vars], env=env)
+            run(
+                ["make", "install", f"PREFIX={self._mangle_path(prefix)}", *make_vars],
+                env=env,
+            )
 
     def _build_with_autoconf(self, package: Package, for_builder: bool) -> None:
         assert package.build_system == "autoconf"

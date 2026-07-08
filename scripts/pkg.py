@@ -61,10 +61,11 @@ gnutls_group = [
 
 codec_group = [
     Package(
-        name="lame",
-        source_url="http://deb.debian.org/debian/pool/main/l/lame/lame_3.100.orig.tar.gz",
-        sha256="ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e",
-        build_arguments=["--disable-gtktest"],
+        name="lamer",
+        source_url="https://github.com/basswood-io/lamer/archive/refs/tags/v3.100.1.tar.gz",
+        source_filename="lamer-3.100.1.tar.gz",
+        sha256="943eac863ff803b5a698cec0bdc483ce9081b1e74ca8978e94daafb44522c946",
+        build_system="make",
     ),
     Package(
         name="opus",

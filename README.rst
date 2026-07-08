@@ -16,7 +16,7 @@ Features
 
 Currently FFmpeg 8.1.2 is built with the following packages enabled for all platforms:
 
-- lame 3.100
+- lame 3.100.1 (basswood-io/lamer)
 - opus 1.6.1
 - dav1d 1.5.3
 - libsvtav1 4.1.0
