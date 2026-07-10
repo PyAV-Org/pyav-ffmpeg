@@ -1,9 +1,6 @@
-pyav-ffmpeg
-===========
+# pyav-ffmpeg
 
-This project provides binary builds of FFmpeg and its dependencies for `PyAV`_.
-These builds are used in order to provide binary wheels of PyAV, allowing
-users to easily install PyAV without perform error-prone compilations.
+This project provides binary builds of FFmpeg and its dependencies for [PyAV](https://github.com/PyAV-Org/PyAV). These builds are used in order to provide binary wheels of PyAV, allowing users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
@@ -16,7 +13,7 @@ Features
 
 Currently FFmpeg 8.1.2 is built with the following packages enabled for all platforms:
 
-- lame 3.100.1 (basswood-io/lamer)
+- [lamer](https://github.com/basswood-io/lamer) 3.101.0
 - opus 1.6.1
 - dav1d 1.5.3
 - libsvtav1 4.1.0
@@ -33,4 +30,3 @@ The following additional packages are also enabled on Linux:
 - nettle 3.10.2
 - unistring 1.4.2
 
-.. _PyAV: https://github.com/PyAV-Org/PyAV
