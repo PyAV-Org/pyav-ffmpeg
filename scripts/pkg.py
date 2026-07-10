@@ -62,9 +62,9 @@ gnutls_group = [
 codec_group = [
     Package(
         name="lamer",
-        source_url="https://github.com/basswood-io/lamer/archive/refs/tags/v3.100.1.tar.gz",
-        source_filename="lamer-3.100.1.tar.gz",
-        sha256="943eac863ff803b5a698cec0bdc483ce9081b1e74ca8978e94daafb44522c946",
+        source_url="https://github.com/basswood-io/lamer/archive/refs/tags/v3.101.0.tar.gz",
+        source_filename="lamer-3.101.0.tar.gz",
+        sha256="81839b16fdc401e20b73389d05f32a7656008f43bcb960feff290d6f08fc109e",
         build_system="make",
     ),
     Package(

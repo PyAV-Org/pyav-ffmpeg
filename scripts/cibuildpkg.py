@@ -166,7 +166,7 @@ class Builder:
     def _build_lame(self, package: Package, for_builder: bool) -> None:
         # basswood-io/lamer builds libmp3lame with a plain Makefile. Build only
         # the static encoder library (the `lib` target, not the ncurses CLI
-        # frontend or mpglib decoder) as position-independent code -- it is
+        # frontend) as position-independent code -- it is
         # linked into the shared libavcodec -- then install it where FFmpeg's
         # configure looks (-lmp3lame, <lame/lame.h>).
         package_source_path = os.path.join(
@@ -175,7 +175,7 @@ class Builder:
         env = self._environment(for_builder=for_builder)
         prefix = self._prefix(for_builder=for_builder)
 
-        make_vars = ["DECODER=0"]
+        make_vars: list[str] = []
         if platform.system() == "Windows":
             # The CLANGARM64 toolchain ships llvm-ar/llvm-ranlib, not ar/ranlib.
             if platform.machine().lower() in {"arm64", "aarch64"}:
