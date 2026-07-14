@@ -15,7 +15,7 @@ Currently FFmpeg 8.1.2 is built with the following packages enabled for all plat
 
 - [lamer](https://github.com/basswood-io/lamer) 3.101.0
 - opus 1.6.1
-- dav1d 1.5.3
+- dav1d 1.5.4
 - libsvtav1 4.1.0
 - vpx 1.16.0
 - png 1.6.58
@@ -29,4 +29,3 @@ The following additional packages are also enabled on Linux:
 - gnutls 3.8.13
 - nettle 3.10.2
 - unistring 1.4.2
-
