@@ -79,6 +79,7 @@ codec_group = [
         sha256="2abfb0c89212e6e4733a54e0ae509ec00a5b845a6360946f918806e14aedb011",
         requires=["nasm"],
         build_system="meson",
+        build_arguments=["-Denable_tests=false"],
     ),
     Package(
         name="libsvtav1",
