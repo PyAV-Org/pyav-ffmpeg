@@ -16,7 +16,7 @@ Currently FFmpeg 8.1.2 is built with the following packages enabled for all plat
 - [lamer](https://github.com/basswood-io/lamer) 3.101.0
 - opus 1.6.1
 - dav1d 1.5.4
-- libsvtav1 4.1.0
+- libsvtav1 4.2.0
 - vpx 1.16.0
 - png 1.6.58
 - webp 1.6.0

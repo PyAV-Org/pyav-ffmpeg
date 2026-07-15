@@ -83,8 +83,8 @@ codec_group = [
     ),
     Package(
         name="libsvtav1",
-        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v4.1.0/SVT-AV1-v4.1.0.tar.bz2",
-        sha256="184162d3db3a4448882b17230413b4938ca252eef6b3c5e2f1236b2fcf497881",
+        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v4.2.0/SVT-AV1-v4.2.0.tar.bz2",
+        sha256="512f2ea5649e3e76c2dddcc25c2556fb67a9582baaab207c9c96161c94659dad",
         build_system="cmake",
         build_arguments=["-DBUILD_APPS=OFF", "-DBUILD_DEC=OFF", "-DBUILD_ENC=ON", "-DENABLE_NASM=ON"],
     ),
