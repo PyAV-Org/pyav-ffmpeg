@@ -27,5 +27,5 @@ Currently FFmpeg 8.1.2 is built with the following packages enabled for all plat
 The following additional packages are also enabled on Linux:
 
 - gnutls 3.8.13
-- nettle 3.10.2
+- nettle 4.0
 - unistring 1.4.2
