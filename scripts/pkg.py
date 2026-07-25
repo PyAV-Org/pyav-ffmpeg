@@ -35,8 +35,8 @@ gnutls_group = [
     ),
     Package(
         name="nettle",
-        source_url="https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz",
-        sha256="fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5",
+        source_url="https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz",
+        sha256="3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094",
         requires=["gmp"],
         build_arguments=["--disable-documentation"],
     ),
