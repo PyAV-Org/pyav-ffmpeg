@@ -132,6 +132,22 @@ def main():
         for tool in tools:
             run(["where", tool])
 
+    if plat == "Linux" and (is_musllinux or shutil.which("xxd") is None):
+        with log_group("install system packages"):
+            # libvmaf uses xxd to embed its built-in models. BusyBox xxd,
+            # provided by musllinux images, cannot write C output to a file.
+            if is_musllinux:
+                run(["apk", "add", "--no-cache", "xxd"])
+            elif shutil.which("dnf"):
+                run(["dnf", "-y", "install", "vim-common"])
+            elif shutil.which("yum"):
+                run(["yum", "-y", "install", "vim-common"])
+            elif shutil.which("apt-get"):
+                run(["apt-get", "update"])
+                run(["apt-get", "install", "-y", "xxd"])
+            else:
+                raise RuntimeError("Unable to install xxd")
+
     with log_group("install python packages"):
         run(["pip", "install", "cmake", "meson", "ninja"])
 
@@ -159,6 +175,7 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libsvtav1",
+        "--enable-libvmaf",
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
