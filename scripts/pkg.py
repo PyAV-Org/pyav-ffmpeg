@@ -126,6 +126,20 @@ codec_group = [
         ],
     ),
     Package(
+        name="libvmaf",
+        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.0.tar.gz",
+        source_filename="vmaf-3.2.0.tar.gz",
+        sha256="a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc",
+        build_system="meson",
+        source_dir="libvmaf",
+        requires=["nasm"],
+        build_arguments=[
+            "-Denable_tests=false",
+            "-Denable_docs=false",
+            "-Denable_tools=false",
+        ],
+    ),
+    Package(
         name="opencore-amr",
         source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
         sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
