@@ -171,8 +171,6 @@ def main():
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libdav1d",
         "--enable-libmp3lame",
-        "--enable-libopencore-amrnb",
-        "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libsvtav1",
         "--enable-libvmaf",
