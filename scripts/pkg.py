@@ -140,12 +140,6 @@ codec_group = [
         ],
     ),
     Package(
-        name="opencore-amr",
-        source_url="https://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.6.tar.gz",
-        sha256="483eb4061088e2b34b358e47540b5d495a96cd468e361050fae615b1809dc4a1",
-        build_arguments=["--disable-dependency-tracking"],
-    ),
-    Package(
         name="x264",
         source_url="https://code.videolan.org/videolan/x264/-/archive/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264-b35605ace3ddf7c1a5d67a2eb553f034aef41d55.tar.bz2",
         sha256="6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff224",
