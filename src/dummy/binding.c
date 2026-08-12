@@ -7,26 +7,23 @@
 
 #define MODULE_NAME "dummy.binding"
 
-static PyObject*
-test(PyObject *Py_UNUSED(self), PyObject *Py_UNUSED(ignored))
+static int
+verify_libvmaf_filter(void)
 {
     const AVFilter *libvmaf;
     AVFilterContext *libvmaf_context;
     AVFilterGraph *graph;
 
-    // initialise libraries
-    avformat_network_init();
-    avdevice_register_all();
-
     libvmaf = avfilter_get_by_name("libvmaf");
     if (libvmaf == NULL) {
         PyErr_SetString(PyExc_RuntimeError, "FFmpeg libvmaf filter is unavailable");
-        return NULL;
+        return -1;
     }
 
     graph = avfilter_graph_alloc();
     if (graph == NULL) {
-        return PyErr_NoMemory();
+        PyErr_NoMemory();
+        return -1;
     }
     if (avfilter_graph_create_filter(
             &libvmaf_context, libvmaf, "libvmaf", NULL, NULL, graph) < 0) {
@@ -35,11 +32,24 @@ test(PyObject *Py_UNUSED(self), PyObject *Py_UNUSED(ignored))
             PyExc_RuntimeError,
             "FFmpeg libvmaf filter initialization failed"
         );
-        return NULL;
+        return -1;
     }
     avfilter_graph_free(&graph);
 
-    fprintf(stderr, "FFmpeg with libvmaf is OK\n");
+    return 0;
+}
+
+static PyObject*
+test(PyObject *Py_UNUSED(self), PyObject *Py_UNUSED(ignored))
+{
+    // initialise libraries
+    avformat_network_init();
+    avdevice_register_all();
+
+    if (verify_libvmaf_filter() < 0)
+        return NULL;
+
+    fprintf(stderr, "FFmpeg is OK\n");
 
     Py_RETURN_NONE;
 }
