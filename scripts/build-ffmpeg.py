@@ -82,6 +82,41 @@ def make_tarball_name() -> str:
     else:
         return "ffmpeg-unknown"
 
+
+def validate_output_tarball(path: str) -> None:
+    runtime_member = None
+    with tarfile.open(path, "r:gz") as tar:
+        for member in tar.getmembers():
+            if not member.isfile() or member.size <= 0:
+                continue
+
+            name = member.name.lower().replace("\\", "/")
+            basename = os.path.basename(name)
+            if plat == "Windows":
+                matches = name == "bin/libvmaf.dll"
+            elif plat == "Darwin":
+                matches = (
+                    name.startswith("lib/")
+                    and basename.startswith("libvmaf.")
+                    and basename.endswith(".dylib")
+                )
+            else:
+                matches = (
+                    name.startswith("lib/")
+                    and basename.startswith("libvmaf.so.")
+                )
+
+            if matches:
+                runtime_member = (member.name, member.size)
+
+    if runtime_member is None:
+        raise RuntimeError(f"VMAF runtime library missing from {path}")
+
+    print(
+        f"{os.path.basename(path)}: {os.path.getsize(path)} bytes "
+        f"({runtime_member[0]}: {runtime_member[1]} bytes)"
+    )
+
 def main():
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
@@ -112,6 +147,7 @@ def main():
 
     output_tarball = os.path.join(output_dir, make_tarball_name() + ".tar.gz")
     if os.path.exists(output_tarball):
+        validate_output_tarball(output_tarball)
         return
 
     builder = Builder(dest_dir=dest_dir)
@@ -159,6 +195,7 @@ def main():
         "--enable-libopencore-amrwb",
         "--enable-libopus",
         "--enable-libsvtav1",
+        "--enable-libvmaf",
         "--enable-libvpx",
         "--enable-libwebp",
         "--enable-libxcb" if plat == "Linux" else "--disable-libxcb",
@@ -341,6 +378,8 @@ def main():
                         else:
                             with open(filepath, "rb") as f:
                                 tar.addfile(info, f)
+
+    validate_output_tarball(output_tarball)
 
 
 if __name__ == "__main__":

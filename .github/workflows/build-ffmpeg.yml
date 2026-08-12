@@ -103,6 +103,7 @@ jobs:
           install: >-
             base-devel
             openssl-devel
+            vim
             ${{ matrix.msys_prefix }}-pkgconf
             ${{ matrix.msys_system == 'CLANGARM64' && format('{0}-clang', matrix.msys_prefix) || format('{0}-gcc {0}-nasm', matrix.msys_prefix) }}
           msystem: ${{ matrix.msys_system }}
@@ -110,6 +111,7 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.msys_system == 'CLANGARM64' && 'ARM64' || (matrix.msys_prefix && 'AMD64' || matrix.arch) }}
+          CIBW_BEFORE_ALL_LINUX: python scripts/install-vmaf-build-tools.py
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor
           CIBW_BUILD: cp311-*
@@ -125,6 +127,7 @@ jobs:
         with:
           name: output-${{ matrix.os }}
           path: output/
+          if-no-files-found: error
 
   cross-build:
     needs: fan
@@ -151,7 +154,7 @@ jobs:
       - name: Build FFmpeg
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL_LINUX: ./scripts/install-static-clang.sh
+          CIBW_BEFORE_ALL_LINUX: python scripts/install-vmaf-build-tools.py && ./scripts/install-static-clang.sh
           CIBW_BEFORE_BUILD_LINUX: python scripts/build-ffmpeg.py /tmp/vendor
           CIBW_BUILD: cp311-${{ matrix.build }}${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
@@ -171,6 +174,7 @@ jobs:
         with:
           name: output-${{ matrix.build }}${{ matrix.arch }}
           path: output/
+          if-no-files-found: error
 
   upload-release:
     if: github.event_name == 'release'

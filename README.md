@@ -21,6 +21,7 @@ Currently FFmpeg 8.1.2 is built with the following packages enabled for all plat
 - png 1.6.58
 - webp 1.6.0
 - opencore-amr 0.1.6
+- vmaf 3.2.0
 - x264 32c3b801191522961102d4bea292cdb61068d0dd (except armv7l)
 - x265 4.2 (except armv7l)
 

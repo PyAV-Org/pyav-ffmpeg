@@ -132,6 +132,21 @@ codec_group = [
         build_arguments=["--disable-dependency-tracking"],
     ),
     Package(
+        name="vmaf",
+        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.0.tar.gz",
+        source_filename="vmaf-3.2.0.tar.gz",
+        sha256="a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc",
+        build_system="meson",
+        source_dir="libvmaf",
+        build_arguments=[
+            "--buildtype=release",
+            "-Ddefault_library=shared",
+            "-Denable_tests=false",
+            "-Denable_docs=false",
+            "-Denable_tools=false",
+        ],
+    ),
+    Package(
         name="x264",
         source_url="https://code.videolan.org/videolan/x264/-/archive/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264-b35605ace3ddf7c1a5d67a2eb553f034aef41d55.tar.bz2",
         sha256="6eeb82934e69fd51e043bd8c5b0d152839638d1ce7aa4eea65a3fedcf83ff224",
@@ -199,7 +214,7 @@ ffmpeg_package = Package(
 
 all_packages: list[Package] = [ffmpeg_package]
 all_packages.extend(codec_group)
-all_packages.extend(gnutls_group) 
+all_packages.extend(gnutls_group)
 all_packages.extend(
     [nasm_package, alsa_package, nvheaders_package, amfheaders_package, libvpl_package]
 )
