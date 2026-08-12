@@ -1,9 +1,34 @@
+import os
 import shutil
 import subprocess
+import tempfile
+
+
+def xxd_supports_model_embedding() -> bool:
+    xxd = shutil.which("xxd")
+    if xxd is None:
+        return False
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        input_path = os.path.join(temp_dir, "input")
+        output_path = os.path.join(temp_dir, "output.c")
+        with open(input_path, "wb") as input_file:
+            input_file.write(b"vmaf")
+        result = subprocess.run(
+            [xxd, "-i", input_path, output_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        return (
+            result.returncode == 0
+            and os.path.exists(output_path)
+            and os.path.getsize(output_path) > 0
+        )
 
 
 def main() -> None:
-    if shutil.which("xxd"):
+    if xxd_supports_model_embedding():
         return
 
     if shutil.which("apt-get"):
@@ -22,8 +47,8 @@ def main() -> None:
         else:
             raise RuntimeError("Unable to install xxd for VMAF model embedding")
 
-    if not shutil.which("xxd"):
-        raise RuntimeError("xxd is unavailable after package installation")
+    if not xxd_supports_model_embedding():
+        raise RuntimeError("xxd does not support VMAF model embedding")
 
 
 if __name__ == "__main__":
