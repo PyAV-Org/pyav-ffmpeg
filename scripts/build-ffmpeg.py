@@ -261,6 +261,17 @@ def main():
                 pkg.build_arguments.append("--disable-rtcd")
                 break
 
+    # No Intel Mac we target can run AVX-512 (and Rosetta cannot either)
+    if plat == "Darwin" and not is_arm:
+        no_avx512 = {
+            "ffmpeg": "--disable-avx512",
+            "vpx": "--disable-avx512",
+            "libsvtav1": "-DENABLE_AVX512=OFF",
+        }
+        for pkg in packages:
+            if pkg.name in no_avx512:
+                pkg.build_arguments.append(no_avx512[pkg.name])
+
     for package in packages:
         builder.build(package, for_builder=package.name == "nasm")
 
