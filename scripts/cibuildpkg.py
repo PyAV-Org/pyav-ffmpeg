@@ -371,6 +371,15 @@ class Builder:
             if disable_sve:
                 flags_high_bits.append("-DENABLE_SVE2=OFF")
 
+        # x265 greps /proc/cpuinfo for NEON, which reports the aarch64 host's
+        # flags ("asimd") inside the 32-bit ARM container. Its NEON .S files are
+        # assembled regardless, so tell it NEON is there or they get -mfpu=vfp.
+        arm32_flags = (
+            ["-DCPU_HAS_NEON=1"]
+            if platform.machine().lower() in {"armv7l", "armv8l", "arm"}
+            else []
+        )
+
         x265_12bits = replace(
             package,
             build_dir="x265-12bits",
@@ -411,7 +420,7 @@ class Builder:
             "-DLINKED_10BIT=1",
             "-DLINKED_12BIT=1",
             "-DEXTRA_LINK_FLAGS=-L../x265-10bits -L../x265-12bits",
-        ] + (["-DENABLE_SVE2=OFF"] if disable_sve else [])
+        ] + (["-DENABLE_SVE2=OFF"] if disable_sve else []) + arm32_flags
         self._build_with_cmake(package=package, for_builder=False)
 
     def _extract(self, package: Package) -> None:
