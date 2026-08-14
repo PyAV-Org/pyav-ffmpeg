@@ -180,11 +180,10 @@ def main():
         "--enable-zlib",
     ]
 
-    # x264/x265 are skipped on 32-bit ARM (armv7)
+    # x264 is skipped on 32-bit ARM (armv7)
+    ffmpeg_package.build_arguments.append("--enable-libx265")
     if not is_arm32:
-        ffmpeg_package.build_arguments.extend(
-            ["--enable-libx264", "--enable-libx265"]
-        )
+        ffmpeg_package.build_arguments.append("--enable-libx264")
 
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
@@ -247,8 +246,8 @@ def main():
     if use_gnutls:
         packages += gnutls_group
     if is_arm32:
-        # x264/x265 are not built on 32-bit ARM (armv7)
-        packages += [p for p in codec_group if p.name not in {"x264", "x265"}]
+        # x264 is not built on 32-bit ARM (armv7)
+        packages += [p for p in codec_group if p.name != "x264"]
     else:
         packages += codec_group
     packages += [ffmpeg_package]

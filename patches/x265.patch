@@ -1,0 +1,24 @@
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -47,7 +47,7 @@
+     string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYSPROC)
+ endif()
+ set(X86_ALIASES x86 i386 i686 x86_64 amd64)
+-set(ARM_ALIASES armv6l armv7l)
++set(ARM_ALIASES armv6l armv7l armv8l)
+ set(ARM64_ALIASES arm64 arm64e aarch64)
+ set(RISCV64_ALIASES riscv64)
+ set(LOONGARCH64_ALIASES loongarch64)
+@@ -325,10 +325,10 @@
+     elseif(ARM)
+         find_package(Neon)
+         if(CPU_HAS_NEON)
+-            set(ARM_ARGS -mcpu=native -mfloat-abi=hard -mfpu=neon -marm -fPIC)
++            set(ARM_ARGS -march=armv7-a -mfloat-abi=hard -mfpu=neon -marm -fPIC)
+             add_definitions(-DHAVE_NEON)
+         else()
+-            set(ARM_ARGS -mcpu=native -mfloat-abi=hard -mfpu=vfp -marm)
++            set(ARM_ARGS -march=armv7-a -mfloat-abi=hard -mfpu=vfp -marm)
+         endif()
+     endif()
+     if(ARM64)
