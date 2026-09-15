@@ -90,9 +90,9 @@ codec_group = [
     ),
     Package(
         name="vpx",
-        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.16.0.tar.gz",
-        sha256="7a479a3c66b9f5d5542a4c6a1b7d3768a983b1e5c14c60a9396edc9b649e015c",
-        source_filename="vpx-1.16.0.tar.gz",
+        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz",
+        sha256="1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a",
+        source_filename="vpx-1.17.0.tar.gz",
         build_arguments=[
             "--disable-examples",
             "--disable-tools",
@@ -118,7 +118,7 @@ codec_group = [
             "-DWEBP_BUILD_CWEBP=OFF",
             "-DWEBP_BUILD_DWEBP=OFF",
             "-DWEBP_BUILD_GIF2WEBP=OFF",
-            "-DWE[118;1:3uBP_BUILD_IMG2WEBP=OFF",
+            "-DWEBP_BUILD_IMG2WEBP=OFF",
             "-DWEBP_BUILD_VWEBP=OFF",
             "-DWEBP_BUILD_WEBPINFO=OFF",
             "-DWEBP_BUILD_WEBPMUX=OFF",
