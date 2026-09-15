@@ -127,9 +127,9 @@ codec_group = [
     ),
     Package(
         name="libvmaf",
-        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.0.tar.gz",
-        source_filename="vmaf-3.2.0.tar.gz",
-        sha256="a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc",
+        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.1.tar.gz",
+        source_filename="vmaf-3.2.1.tar.gz",
+        sha256="5df7386911bc15fd1ca783132528748d219768ae4fc5f8e0b61184f041648092",
         build_system="meson",
         source_dir="libvmaf",
         requires=["nasm"],
