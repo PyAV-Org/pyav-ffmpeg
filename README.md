@@ -20,7 +20,7 @@ Currently FFmpeg 9.0.1 is built with the following packages enabled for all plat
 - vpx 1.17.0
 - png 1.6.58
 - webp 1.6.0
-- libvmaf 3.2.0
+- libvmaf 3.2.1
 - x264 b35605ace3ddf7c1a5d67a2eb553f034aef41d55 (except armv7l)
 - x265 4.3
 
