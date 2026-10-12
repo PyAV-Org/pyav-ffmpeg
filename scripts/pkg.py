@@ -193,6 +193,26 @@ libvpl_package = Package(
     ],
 )
 
+opencolorio_package = Package(
+    name="opencolorio",
+    source_url="https://github.com/AcademySoftwareFoundation/OpenColorIO/releases/download/v2.6.0/opencolorio-2.6.0.tar.gz",
+    sha256="9271f4cb7751b465daf0e178323aef3f3fdf7595908ee4bb6442cceb73a24296",
+    build_system="cmake",
+    build_arguments=[
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DOCIO_BUILD_APPS=OFF",
+        "-DOCIO_BUILD_DOCS=OFF",
+        "-DOCIO_BUILD_GPU_TESTS=OFF",
+        "-DOCIO_BUILD_PYTHON=OFF",
+        "-DOCIO_BUILD_TESTS=OFF",
+        "-DOCIO_DIRECTX_ENABLED=OFF",
+        # Fetch expat, yaml-cpp, Imath, pystring, minizip-ng and zlib at
+        # configure time and link them statically (with hidden symbols) into
+        # libOpenColorIO, so the shared library is self-contained.
+        "-DOCIO_INSTALL_EXT_PACKAGES=ALL",
+    ],
+)
+
 nasm_package = Package(
     name="nasm",
     source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.xz",
@@ -207,7 +227,14 @@ ffmpeg_package = Package(
 
 all_packages: list[Package] = [ffmpeg_package]
 all_packages.extend(codec_group)
-all_packages.extend(gnutls_group) 
+all_packages.extend(gnutls_group)
 all_packages.extend(
-    [nasm_package, alsa_package, nvheaders_package, amfheaders_package, libvpl_package]
+    [
+        nasm_package,
+        alsa_package,
+        nvheaders_package,
+        amfheaders_package,
+        libvpl_package,
+        opencolorio_package,
+    ]
 )

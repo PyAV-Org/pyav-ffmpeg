@@ -171,6 +171,7 @@ def main():
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
         "--enable-libdav1d",
         "--enable-libmp3lame",
+        "--enable-libopencolorio",
         "--enable-libopus",
         "--enable-libsvtav1",
         "--enable-libvmaf",
@@ -250,7 +251,7 @@ def main():
         packages += [p for p in codec_group if p.name != "x264"]
     else:
         packages += codec_group
-    packages += [ffmpeg_package]
+    packages += [opencolorio_package, ffmpeg_package]
 
     # Disable runtime CPU detection for opus on Windows ARM64
     # (no CPU detection method available for this platform)
@@ -266,6 +267,7 @@ def main():
             "ffmpeg": "--disable-avx512",
             "vpx": "--disable-avx512",
             "libsvtav1": "-DENABLE_AVX512=OFF",
+            "opencolorio": "-DOCIO_USE_AVX512=OFF",
         }
         for pkg in packages:
             if pkg.name in no_avx512:
