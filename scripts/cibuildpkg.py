@@ -454,6 +454,13 @@ class Builder:
         if os.path.exists(patch):
             run(["patch", "-d", path, "-i", patch, "-p1"])
 
+        # On case-insensitive filesystems (macOS), C++ standard headers doing
+        # `#include <version>` pick up FFmpeg's VERSION file via -I$(SRC_PATH).
+        # Upstream renamed it to FF_VERSION; ffmpeg.patch updates version.sh.
+        version_file = os.path.join(path, "VERSION")
+        if package.name == "ffmpeg" and os.path.exists(version_file):
+            os.rename(version_file, os.path.join(path, "FF_VERSION"))
+
     def _environment(self, *, for_builder: bool) -> dict[str, str]:
         env = os.environ.copy()
 

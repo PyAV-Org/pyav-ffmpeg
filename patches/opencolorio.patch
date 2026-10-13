@@ -1,6 +1,27 @@
+--- a/share/cmake/modules/install/InstallZLIB.cmake
++++ b/share/cmake/modules/install/InstallZLIB.cmake
+@@ -95,6 +95,7 @@
+             # this pre-seeded value would default to a platform-specific dir (e.g. lib64),
+             # breaking the hardcoded "${_ZLIB_INSTALL_LIBDIR}" path used below.
+             -DCMAKE_INSTALL_LIBDIR=${_ZLIB_INSTALL_LIBDIR}
++            -DZLIB_BUILD_TESTING=OFF
+         )
+ 
+         if(CMAKE_TOOLCHAIN_FILE)
+@@ -158,8 +159,8 @@
+             COMMENT "Alias ${_ZLIB_STATIC_LIB_NAME}.lib as zlibstatic.lib for downstream find_package(ZLIB)"
+             DEPENDEES zlib_remove_dll
+             COMMAND ${CMAKE_COMMAND} -E copy
+-                ${_EXT_DIST_ROOT}/${_ZLIB_INSTALL_LIBDIR}/${_ZLIB_STATIC_LIB_NAME}${_ZLIB_LIB_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+-                ${_EXT_DIST_ROOT}/${_ZLIB_INSTALL_LIBDIR}/zlibstatic${_ZLIB_LIB_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
++                ${_EXT_DIST_ROOT}/${_ZLIB_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${_ZLIB_STATIC_LIB_NAME}${_ZLIB_LIB_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
++                ${_EXT_DIST_ROOT}/${_ZLIB_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}zlibstatic${_ZLIB_LIB_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         )
+     endif()
+ 
 --- a/src/OpenColorIO/transforms/FileTransform.cpp
 +++ b/src/OpenColorIO/transforms/FileTransform.cpp
-@@ -218,7 +218,7 @@ std::unique_ptr<std::istream> getLutData(
+@@ -218,7 +218,7 @@
  
      // Default behavior. Return file stream.
      return std::unique_ptr<std::istream>(new std::ifstream(
