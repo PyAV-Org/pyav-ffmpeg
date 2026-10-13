@@ -35,3 +35,34 @@ index edc4dd3..1c6f70b 100755
  test "$version" || version=$revision
  
  test -n "$3" && version=$version-$3
+diff --git a/libavutil/riscv/intmath.h b/libavutil/riscv/intmath.h
+index a09248f..60a3f38 100644
+--- a/libavutil/riscv/intmath.h
++++ b/libavutil/riscv/intmath.h
+@@ -35,7 +35,7 @@
+ #define av_clip_int8 av_clip_int8_rvi
+ static av_always_inline av_const int8_t av_clip_int8_rvi(int a)
+ {
+-    union { uint8_t u; int8_t s; } u = { .u = a };
++    union { uint8_t u; int8_t s; } u = { .u = (uint8_t)a };
+ 
+     if (a != u.s)
+         a = ((a >> 31) ^ 0x7F);
+@@ -45,7 +45,7 @@ static av_always_inline av_const int8_t av_clip_int8_rvi(int a)
+ #define av_clip_int16 av_clip_int16_rvi
+ static av_always_inline av_const int16_t av_clip_int16_rvi(int a)
+ {
+-    union { uint16_t u; int16_t s; } u = { .u = a };
++    union { uint16_t u; int16_t s; } u = { .u = (uint16_t)a };
+ 
+     if (a != u.s)
+         a = ((a >> 31) ^ 0x7FFF);
+@@ -55,7 +55,7 @@ static av_always_inline av_const int16_t av_clip_int16_rvi(int a)
+ #define av_clipl_int32 av_clipl_int32_rvi
+ static av_always_inline av_const int32_t av_clipl_int32_rvi(int64_t a)
+ {
+-    union { uint32_t u; int32_t s; } u = { .u = a };
++    union { uint32_t u; int32_t s; } u = { .u = (uint32_t)a };
+ 
+     if (a != u.s)
+         a = ((a >> 63) ^ 0x7FFFFFFF);
