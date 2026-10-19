@@ -157,6 +157,68 @@ codec_group = [
     ),
 ]
 
+# libass and its dependencies. Fontconfig is not built: libass uses CoreText on
+# macOS and DirectWrite on Windows, and on Linux only fonts given by path or
+# attached to the file.
+ass_group = [
+    Package(
+        name="freetype",
+        source_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.15.0.tar.xz",
+        sha256="93cd47eb719c325107f2d3cf087d06299e944c3b48a40b55537302304dea1dd5",
+        build_system="cmake",
+        build_arguments=[
+            "-DFT_DISABLE_ZLIB=ON",
+            "-DFT_DISABLE_BZIP2=ON",
+            "-DFT_DISABLE_PNG=ON",
+            "-DFT_DISABLE_HARFBUZZ=ON",
+            "-DFT_DISABLE_BROTLI=ON",
+            "-DFT_DISABLE_HVF=ON",
+        ],
+    ),
+    Package(
+        name="fribidi",
+        source_url="https://github.com/fribidi/fribidi/releases/download/v1.0.17/fribidi-1.0.17.tar.xz",
+        sha256="6949dcde27d41cebad1fd741fcafc36d55a1020d2d872d4a6eb3914caabbada2",
+        build_system="meson",
+        build_arguments=["-Ddocs=false", "-Dbin=false", "-Dtests=false"],
+    ),
+    Package(
+        name="harfbuzz",
+        source_url="https://github.com/harfbuzz/harfbuzz/releases/download/14.6.0/harfbuzz-14.6.0.tar.xz",
+        sha256="d07a007327277708a2a73ae437887cdbaf282937f6d03ca5467723e9099af586",
+        build_system="meson",
+        build_arguments=[
+            "--auto-features=disabled",
+            "-Dtests=disabled",
+            "-Ddocs=disabled",
+            "-Dutilities=disabled",
+            "-Dintrospection=disabled",
+            "-Dbenchmark=disabled",
+            "-Draster=disabled",
+            "-Dvector=disabled",
+            "-Dgpu=disabled",
+            "-Dsubset=disabled",
+        ],
+    ),
+    Package(
+        name="libass",
+        source_url="https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz",
+        sha256="2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc",
+        build_system="meson",
+        requires=["freetype", "fribidi", "harfbuzz"],
+        build_arguments=[
+            "--auto-features=disabled",
+            "-Dtest=disabled",
+            "-Dcompare=disabled",
+            "-Dprofile=disabled",
+            "-Dfuzz=disabled",
+            "-Dcheckasm=disabled",
+            "-Dlibunibreak=disabled",
+            "-Dfontconfig=disabled",
+        ],
+    ),
+]
+
 alsa_package = Package(
     name="alsa-lib",
     source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
@@ -207,6 +269,7 @@ ffmpeg_package = Package(
 
 all_packages: list[Package] = [ffmpeg_package]
 all_packages.extend(codec_group)
+all_packages.extend(ass_group)
 all_packages.extend(gnutls_group) 
 all_packages.extend(
     [nasm_package, alsa_package, nvheaders_package, amfheaders_package, libvpl_package]

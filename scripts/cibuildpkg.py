@@ -333,7 +333,7 @@ class Builder:
         # determine meson arguments
         env = self._environment(for_builder=for_builder)
         prefix = self._prefix(for_builder=for_builder)
-        meson_args = ["--libdir=lib", "--prefix=" + prefix]
+        meson_args = ["--buildtype=release", "--libdir=lib", "--prefix=" + prefix]
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)
