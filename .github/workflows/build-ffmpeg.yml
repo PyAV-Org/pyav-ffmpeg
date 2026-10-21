@@ -1,13 +1,13 @@
 name: build-ffmpeg
 on:
   push:
-    branches: main
+    branches: master
     paths-ignore:
       - '**.md'
       - '**.rst'
       - '**.txt'
   pull_request:
-    branches: main
+    branches: master
     paths-ignore:
       - '**.md'
       - '**.rst'
@@ -94,9 +94,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxcb libxdmcp
-          if [ "${{ matrix.os }}" = "macos-15-intel" ]; then
-            brew install nasm
-          fi
       - uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows'
         with:
@@ -121,7 +118,7 @@ jobs:
           cibuildwheel --output-dir output
           rm -f output/*.whl
       - name: Upload FFmpeg
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: output-${{ matrix.os }}
           path: output/
@@ -160,7 +157,6 @@ jobs:
             LDFLAGS="-fuse-ld=lld"
           CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_ARCH
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
           pip install cibuildwheel delvewheel
