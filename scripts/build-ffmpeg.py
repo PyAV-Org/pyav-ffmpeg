@@ -256,7 +256,7 @@ def main():
     packages += [ffmpeg_package]
 
     # Where libass finds the system's fonts. Linux has no provider without
-    # fontconfig. Its x86 assembly needs nasm; elsewhere it's plain C.
+    # fontconfig. It has x86 (nasm) and aarch64 assembly; elsewhere it's plain C.
     for pkg in packages:
         if pkg.name == "libass":
             pkg.build_arguments += [
@@ -264,7 +264,7 @@ def main():
                 "-Ddirectwrite=" + ("enabled" if plat == "Windows" else "disabled"),
                 "-Drequire-system-font-provider="
                 + ("false" if plat == "Linux" else "true"),
-                "-Dasm=" + ("enabled" if is_x86 else "disabled"),
+                "-Dasm=" + ("enabled" if is_x86 or (is_arm and not is_arm32) else "disabled"),
             ]
 
     # Disable runtime CPU detection for opus on Windows ARM64
