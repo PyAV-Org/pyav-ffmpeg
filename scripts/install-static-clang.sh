@@ -20,19 +20,19 @@ case "${STATIC_CLANG_ARCH}" in
 	s390x) GO_ARCH=s390x;;
 	*) echo "No static-clang toolchain for ${CLANG_ARCH}">2; exit 1;;
 esac
-STATIC_CLANG_VERSION=21.1.8.1
+STATIC_CLANG_VERSION=23.1.4.0
 STATIC_CLANG_FILENAME="static-clang-linux-${GO_ARCH}.tar.xz"
 STATIC_CLANG_URL="https://github.com/mayeut/static-clang-images/releases/download/v${STATIC_CLANG_VERSION}/${STATIC_CLANG_FILENAME}"
 pushd /tmp
 cat<<'EOF' | grep "${STATIC_CLANG_FILENAME}" > "${STATIC_CLANG_FILENAME}.sha256"
-583980309e73fa753c0791e05deceac7cb06c5444956d61189f1d651941bcd8e  static-clang-linux-386.tar.xz
-f539f1fd24bcc07ecc220594022907865914236540091fbf189cb496a9a3751c  static-clang-linux-amd64.tar.xz
-d0c8b7fac4734cc8048fda3b1f33ccdf24d26f81a52df53348e5fa84ab4b203a  static-clang-linux-arm.tar.xz
-57fb9cf798b3a2c4b0f3c31c0b7fe3803b5319d2af075407e1aef0cd57882f65  static-clang-linux-arm64.tar.xz
-5a2b296e9030d0320d9e4eac8859e5db0504cf1d4169981af233cb339292fa4c  static-clang-linux-loong64.tar.xz
-c8541b2d36f0fd8f13ddabe1292b6fb7550a742e76e0f1f70fb29fcee073be4a  static-clang-linux-ppc64le.tar.xz
-b311137f955b55139b02e8c1d7ec259628404a0563d136df7a817a33784bd2bf  static-clang-linux-riscv64.tar.xz
-de74fd8e5de244d36398684b2afa67add2311df6ccfa24f3c08a1d777ca814fa  static-clang-linux-s390x.tar.xz
+4070a2a3342eb93fcc686b974dcd663490bbe8da01c082924cce6e07675bcc85  static-clang-linux-386.tar.xz
+6580146eab36228d9e10dbf280a67adb11ce5d4b0275ac14302fcbf4f722e2a3  static-clang-linux-amd64.tar.xz
+41ecc4bda79a3db83fe6f1b719f368b201ed0ced614856c3ce32fa3f031ed6bf  static-clang-linux-arm.tar.xz
+501b34ca9d21bfa08a40d99eb5bd06664f6209a244bb2d52f007ad6fec977623  static-clang-linux-arm64.tar.xz
+cc45b104c92201361446e20794c59011b4f9005f3601354b31f22ff4414e79f1  static-clang-linux-loong64.tar.xz
+88097702c270ad3646ad47f90ad9d77b48aa321e04b33a24120d7b7ccbfdc927  static-clang-linux-ppc64le.tar.xz
+775437eb73958e24328f36135f92cbe3db964771e5bd0354b0f1cffa5c784798  static-clang-linux-riscv64.tar.xz
+1004c314ce1e0a14c216df0d350c8e5da3978085f269c8ee6cee03354b78c0d9  static-clang-linux-s390x.tar.xz
 EOF
 curl -fsSLO "${STATIC_CLANG_URL}"
 sha256sum -c "${STATIC_CLANG_FILENAME}.sha256"

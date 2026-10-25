@@ -30,8 +30,8 @@ gnutls_group = [
     ),
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.gz",
-        sha256="e82664b170064e62331962126b259d452d53b227bb4a93ab20040d846fec01d8",
+        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.gz",
+        sha256="5b0ecd46cbf225375f20ab4056197e66a7ac590e2684c069af407ae3383c9d81",
     ),
     Package(
         name="nettle",
@@ -102,8 +102,8 @@ codec_group = [
     ),
     Package(
         name="png",
-        source_url="https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
-        sha256="28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775",
+        source_url="https://downloads.sourceforge.net/project/libpng/libpng16/1.6.59/libpng-1.6.59.tar.xz",
+        sha256="d80dd2a38a37f803cb9b6ac7b14bd6e74ddc3b654780a8380bdf93523fdb4389",
         # avoid an assembler error on Windows
         build_arguments=["PNG_COPTS=-fno-asynchronous-unwind-tables"],
     ),
@@ -184,8 +184,8 @@ ass_group = [
     ),
     Package(
         name="harfbuzz",
-        source_url="https://github.com/harfbuzz/harfbuzz/releases/download/14.6.0/harfbuzz-14.6.0.tar.xz",
-        sha256="d07a007327277708a2a73ae437887cdbaf282937f6d03ca5467723e9099af586",
+        source_url="https://github.com/harfbuzz/harfbuzz/releases/download/15.0.0/harfbuzz-15.0.0.tar.xz",
+        sha256="968536e9abd782f07f7954044c0c4020199fcdd39b41d221ec42d2a3be4a44df",
         build_system="meson",
         build_arguments=[
             "--auto-features=disabled",
@@ -221,29 +221,29 @@ ass_group = [
 
 alsa_package = Package(
     name="alsa-lib",
-    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
-    sha256="be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32",
+    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.1.tar.bz2",
+    sha256="f740db7f488255944ffd4428416ee3390a96742856916433df468c281436480e",
     build_arguments=["--disable-python"],
 )
 
 nvheaders_package = Package(
     name="nv-codec-headers",
-    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
-    sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
+    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.1.tar.gz",
+    sha256="c293161bd92dac53f2f8fab08abcd4f96773c3644a57b23c2260b4be2311ab2f",
     build_system="make",
 )
 
 amfheaders_package = Package(
     name="amf-headers",
-    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.2/AMF-headers-v1.5.2.tar.gz",
-    sha256="d3c12eb324edf05e214608b6a395a51dd95770ed9d45520185d6c3a206811c99",
+    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.3/AMF-headers-v1.5.3.tar.gz",
+    sha256="0f521ad98041f8001147cded4a660127f18b1c27a801a5cd691bda1fa48381be",
     build_system="make",
 )
 
 libvpl_package = Package(
     name="libvpl",
-    source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.16.0.tar.gz",
-    sha256="d60931937426130ddad9f1975c010543f0da99e67edb1c6070656b7947f633b6",
+    source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.17.0.tar.gz",
+    sha256="4de3e2faf1e8307fb282e4a43f443191810f6a6b0a484fffa7995ba1c814c6ec",
     build_system="cmake",
     build_arguments=[
         "-DINSTALL_LIB=ON",
@@ -257,8 +257,8 @@ libvpl_package = Package(
 
 nasm_package = Package(
     name="nasm",
-    source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.xz",
-    sha256="1412a1c760bbd05db026b6c0d1657affd6631cd0a63cddb6f73cc6d4aa616148",
+    source_url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/nasm-3.02.tar.xz",
+    sha256="87336eba53b4acfe917424ab5d500d2b0054d9f5148d35c2273ccf2cfb712f0d",
 )
 
 ffmpeg_package = Package(
