@@ -22,3 +22,13 @@
          endif()
      endif()
      if(ARM64)
+@@ -1148,6 +1148,9 @@
+         add_library(x265-shared SHARED "${PROJECT_BINARY_DIR}/x265.def" ${ASM_OBJS}
+                    ${X265_RC_FILE} $<TARGET_OBJECTS:encoder> $<TARGET_OBJECTS:common>)
+     endif()
++    # x265-static and x265-shared both list ${ASM_OBJS}, so a parallel make
++    # assembles each object twice at once and can link a half-written file.
++    add_dependencies(x265-shared x265-static)
+     if(EXTRA_LIB)
+         target_link_libraries(x265-shared ${EXTRA_LIB})
+     endif()
