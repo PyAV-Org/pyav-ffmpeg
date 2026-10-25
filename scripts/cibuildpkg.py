@@ -225,9 +225,7 @@ class Builder:
         ]
 
         if package.name == "x264":
-            # Disable asm on Windows ARM64 (no nasm available)
             if platform.system() == "Windows" and platform.machine().lower() in {"arm64", "aarch64"}:
-                configure_args.append("--disable-asm")
                 # Specify host to ensure correct resource compiler target
                 configure_args.append("--host=aarch64-w64-mingw32")
 
