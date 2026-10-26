@@ -62,9 +62,9 @@ gnutls_group = [
 codec_group = [
     Package(
         name="bwlame",
-        source_url="https://github.com/basswood-io/bwlame/archive/refs/tags/v3.101.0.tar.gz",
-        source_filename="bwlame-3.101.0.tar.gz",
-        sha256="506d8a6e855f59151a5407d848557f9ac10acad6ff61718c7b0b3441221bfe72",
+        source_url="https://github.com/basswood-io/bwlame/archive/refs/tags/v4.1.0.tar.gz",
+        source_filename="bwlame-4.1.0.tar.gz",
+        sha256="f07647a8db7cf511cb6a82e69483bc3c1ad87355995a74193801029c368cb45c",
         build_system="make",
     ),
     Package(
