@@ -95,7 +95,7 @@ class Builder:
 
         with log_group(f"build {package.name}"):
             self._extract(package)
-            if package.name == "lamer":
+            if package.name == "bwlame":
                 self._build_lame(package, for_builder=for_builder)
             elif package.name == "x265":
                 self._build_x265(package)
@@ -164,7 +164,7 @@ class Builder:
             run(install_command, env=env)
 
     def _build_lame(self, package: Package, for_builder: bool) -> None:
-        # basswood-io/lamer builds libmp3lame with a plain Makefile. Build only
+        # basswood-io/bwlame builds libmp3lame with a plain Makefile. Build only
         # the static encoder library (the `lib` target, not the ncurses CLI
         # frontend) as position-independent code -- it is
         # linked into the shared libavcodec -- then install it where FFmpeg's

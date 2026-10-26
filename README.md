@@ -13,7 +13,7 @@ Features
 
 Currently FFmpeg 9.0.2 is built with the following packages enabled for all platforms:
 
-- [lamer](https://github.com/basswood-io/lamer) 3.101.0
+- [bwlame](https://github.com/basswood-io/bwlame) 3.101.0
 - opus 1.6.1
 - dav1d 1.5.4
 - libsvtav1 4.2.0
