@@ -101,13 +101,6 @@ codec_group = [
         ],
     ),
     Package(
-        name="png",
-        source_url="https://downloads.sourceforge.net/project/libpng/libpng16/1.6.59/libpng-1.6.59.tar.xz",
-        sha256="d80dd2a38a37f803cb9b6ac7b14bd6e74ddc3b654780a8380bdf93523fdb4389",
-        # avoid an assembler error on Windows
-        build_arguments=["PNG_COPTS=-fno-asynchronous-unwind-tables"],
-    ),
-    Package(
         name="webp",
         source_url="https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz",
         sha256="93a852c2b3efafee3723efd4636de855b46f9fe1efddd607e1f42f60fc8f2136",
