@@ -225,8 +225,7 @@ def main():
 
     ffmpeg_package.build_arguments.extend(
         [
-            "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd",
-            "--disable-decoder=sonic",
+            "--disable-encoder=avui,dca,mlp,opus,s302m,truehd",
             "--disable-libjack",
             "--disable-indev=jack",
             "--disable-filter=gfxcapture",  # gfxcapture_winrt C++ causes build failure on Win Arm
