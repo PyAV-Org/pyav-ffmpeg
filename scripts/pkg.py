@@ -194,11 +194,16 @@ ass_group = [
         ],
     ),
     Package(
+        name="libunibreak",
+        source_url="https://github.com/adah1972/libunibreak/releases/download/libunibreak_8_0/libunibreak-8.0.tar.gz",
+        sha256="9c4fad6e517338a098373acc9f35579ae2c325e6446666fb9ac2666ba15ceba4",
+    ),
+    Package(
         name="libass",
         source_url="https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz",
         sha256="2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc",
         build_system="meson",
-        requires=["freetype", "fribidi", "harfbuzz"],
+        requires=["freetype", "fribidi", "harfbuzz", "libunibreak"],
         build_arguments=[
             "--auto-features=disabled",
             "-Dtest=disabled",
@@ -206,7 +211,7 @@ ass_group = [
             "-Dprofile=disabled",
             "-Dfuzz=disabled",
             "-Dcheckasm=disabled",
-            "-Dlibunibreak=disabled",
+            "-Dlibunibreak=enabled",
             "-Dfontconfig=disabled",
         ],
     ),
