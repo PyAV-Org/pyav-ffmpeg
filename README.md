@@ -16,7 +16,7 @@ Currently FFmpeg 9.0.2 is built with the following packages enabled for all plat
 - [bwlame](https://github.com/basswood-io/bwlame) 4.1.0
 - opus 1.6.1
 - dav1d 1.5.4
-- libsvtav1 4.2.0
+- libsvtav1 4.3.0
 - vpx 1.17.0
 - webp 1.6.0
 - libvmaf 3.2.1
