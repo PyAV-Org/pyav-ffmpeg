@@ -358,18 +358,19 @@ class Builder:
         # builds in dummy directory
         dummy_install_path = os.path.join(package_path, "dummy_install_path")
 
-        # For 10/12 bits version, only x86_64 has assembly instructions available
+        # For 10/12 bits version, only x86_64 and AArch64 have assembly
+        # instructions available.
         flags_high_bits = []
 
         disable_sve = platform.system() == "Linux" and platform.machine() == "aarch64"
-        if platform.machine() not in {"x86_64", "amd64"}:
+        if platform.machine().lower() not in {"x86_64", "amd64", "arm64", "aarch64"}:
             flags_high_bits.append("-DENABLE_ASSEMBLY=0")
             flags_high_bits.append("-DENABLE_ALTIVEC=0")
 
-            if disable_sve:
-                flags_high_bits.append("-DENABLE_SVE2=OFF")
+        if disable_sve:
+            flags_high_bits.append("-DENABLE_SVE2=OFF")
 
-        # x265 greps /proc/cpuinfo for NEON, which reports the aarch64 host's
+        # x265 greps /proc/cpuinfo for NEON, which reports the AArch64 host's
         # flags ("asimd") inside the 32-bit ARM container. Its NEON .S files are
         # assembled regardless, so tell it NEON is there or they get -mfpu=vfp.
         arm32_flags = (
