@@ -109,7 +109,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.msys_system == 'CLANGARM64' && 'ARM64' || (matrix.msys_prefix && 'AMD64' || matrix.arch) }}
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor
-          CIBW_BUILD: cp311-*
+          CIBW_BUILD: cp312-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
@@ -150,7 +150,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_ALL_LINUX: ./scripts/install-static-clang.sh
           CIBW_BEFORE_BUILD_LINUX: python scripts/build-ffmpeg.py /tmp/vendor
-          CIBW_BUILD: cp311-${{ matrix.build }}${{ matrix.arch }}
+          CIBW_BUILD: cp312-${{ matrix.build }}${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
             CC="/opt/clang/bin/clang"
             CXX="/opt/clang/bin/clang++"
