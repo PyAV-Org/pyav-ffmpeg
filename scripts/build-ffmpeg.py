@@ -82,6 +82,23 @@ def make_tarball_name() -> str:
     else:
         return "ffmpeg-unknown"
 
+def nasm_on_path_is_pinned() -> bool:
+    """True if a nasm on PATH reports the version pinned in pkg.py.
+
+    CI builds one static nasm for the Linux containers (scripts/build-nasm.py).
+    Any other nasm is ignored so builds always use the pinned version.
+    """
+    nasm = shutil.which("nasm")
+    if nasm is None:
+        return False
+    pinned = nasm_package.source_url.split("/")[-1].removeprefix("nasm-")
+    pinned = pinned.split(".tar")[0]
+    out = subprocess.run([nasm, "-v"], capture_output=True, text=True).stdout
+    found = out.split()[2] if len(out.split()) > 2 else ""
+    print(f"nasm on PATH: {nasm} ({found}), pinned: {pinned}")
+    return found == pinned
+
+
 def main():
     parser = argparse.ArgumentParser("build-ffmpeg")
     parser.add_argument("destination")
@@ -132,6 +149,8 @@ def main():
             tools = ["gcc", "g++", "curl", "ld", "nasm", "pkg-config"]
         for tool in tools:
             run(["where", tool])
+    elif nasm_on_path_is_pinned():
+        available_tools.add("nasm")
 
     if plat == "Linux" and (is_musllinux or shutil.which("xxd") is None):
         with log_group("install system packages"):
