@@ -94,6 +94,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxcb libxdmcp
+      # Build nasm once for both the manylinux and musllinux containers
+      - name: Build nasm
+        if: runner.os == 'Linux' && matrix.arch == 'x86_64'
+        run: python scripts/build-nasm.py tools/bin
       - uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows'
         with:
@@ -110,6 +114,8 @@ jobs:
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor
           CIBW_BUILD: cp311-*
+          # cibuildwheel copies the project to /project in each container
+          CIBW_ENVIRONMENT_LINUX: PATH=/project/tools/bin:$PATH
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
