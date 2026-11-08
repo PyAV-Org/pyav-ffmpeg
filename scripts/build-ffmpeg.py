@@ -82,6 +82,28 @@ def make_tarball_name() -> str:
     else:
         return "ffmpeg-unknown"
 
+# Built as part of a dependency, but neither FFmpeg nor any other shipped
+# library links against them.
+UNUSED_LIBS = ("libatopology", "alsa-topology", "libwebpdecoder", "libwebpdemux")
+
+
+def is_shipped(arcname: str) -> bool:
+    """Whether a file under the install prefix goes into the output tarball.
+
+    Consumers link only against FFmpeg's shared libraries, so the tarball keeps
+    FFmpeg's headers and the shared libraries they need at runtime. Static
+    archives are dropped: they are either linked into FFmpeg already (bwlame,
+    libass) or duplicate a shipped shared library (x265, vmaf).
+    """
+    parts = arcname.replace(os.sep, "/").split("/")
+    name = parts[-1]
+    if parts[0] == "include":
+        return parts[1].startswith(("libav", "libsw"))
+    if name.endswith(".a") and not name.endswith(".dll.a"):
+        return False
+    return not name.startswith(UNUSED_LIBS)
+
+
 def nasm_on_path_is_pinned() -> bool:
     """True if a nasm on PATH reports the version pinned in pkg.py.
 
@@ -354,13 +376,16 @@ def main():
         for name in dll_names:
             shutil.copy(os.path.join(mingw_bindir, name), os.path.join(dest_dir, "bin"))
 
-    # find libraries
+    # find libraries. Strip the real files, never the symlinks: llvm-strip
+    # (used by the cross builds) replaces a symlink with a stripped copy and
+    # leaves the file it points to unstripped.
     if plat == "Darwin":
-        libraries = glob.glob(os.path.join(dest_dir, "lib", "*.dylib"))
+        pattern = os.path.join(dest_dir, "lib", "*.dylib")
     elif plat == "Linux":
-        libraries = glob.glob(os.path.join(dest_dir, "lib", "*.so"))
+        pattern = os.path.join(dest_dir, "lib", "*.so*")
     elif plat == "Windows":
-        libraries = glob.glob(os.path.join(dest_dir, "bin", "*.dll"))
+        pattern = os.path.join(dest_dir, "bin", "*.dll")
+    libraries = [p for p in glob.glob(pattern) if not os.path.islink(p)]
 
     if plat == "Darwin":
         run(["strip", "-x", "-S"] + libraries)
@@ -388,6 +413,8 @@ def main():
                             continue
                         filepath = os.path.join(root, name)
                         arcname = os.path.relpath(filepath, dest_dir)
+                        if not is_shipped(arcname):
+                            continue
                         info = tar.gettarinfo(filepath, arcname=arcname)
                         info.mtime = 0
                         info.uid = 0
