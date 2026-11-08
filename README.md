@@ -11,7 +11,7 @@ The builds are provided for several platforms:
 Features
 --------
 
-Currently FFmpeg 8.1.2 is built with the following packages enabled for all platforms:
+Currently FFmpeg 8.1.3 is built with the following packages enabled for all platforms:
 
 - [bwlame](https://github.com/basswood-io/bwlame) 4.1.0
 - opus 1.6.1
