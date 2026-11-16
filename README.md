@@ -25,7 +25,7 @@ Currently FFmpeg 9.0.2 is built with the following packages enabled for all plat
 - freetype 2.15.0
 - fribidi 1.0.18
 - harfbuzz 15.1.0
-- libunibreak 8.0
+- libunibreak 8.0.1
 - libass 0.17.5
 
 The following additional packages are also enabled on Linux:
