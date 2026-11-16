@@ -135,8 +135,8 @@ def main():
     is_x86 = machine in {"x86_64", "amd64", "i686", "i386"}
 
     use_alsa = plat == "Linux"
-    # CUDA, AMF, and Intel VPL are not available on ARM64 Windows
-    use_cuda = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
+    # AMF and Intel VPL have no ARM hardware.
+    use_cuda = plat in {"Linux", "Windows"} and not is_arm32 and not is_riscv
     use_amf = plat in {"Linux", "Windows"} and not is_arm and not is_riscv
 
     # Use Intel VPL (Video Processing Library) if supported to enable Intel QSV (Quick Sync Video)
