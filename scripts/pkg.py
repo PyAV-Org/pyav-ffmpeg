@@ -75,8 +75,8 @@ codec_group = [
     ),
     Package(
         name="dav1d",
-        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.4/dav1d-1.5.4.tar.bz2",
-        sha256="2abfb0c89212e6e4733a54e0ae509ec00a5b845a6360946f918806e14aedb011",
+        source_url="https://code.videolan.org/videolan/dav1d/-/archive/1.5.5/dav1d-1.5.5.tar.bz2",
+        sha256="afc5378daba30eafd11d7b4f0ec863270d7b175f38393a2e1e0ff76f3a45c8b9",
         requires=["nasm"],
         build_system="meson",
         build_arguments=["-Denable_tests=false"],
