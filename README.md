@@ -24,7 +24,7 @@ Currently FFmpeg 9.1 is built with the following packages enabled for all platfo
 - x265 4.3
 - freetype 2.15.0
 - fribidi 1.0.18
-- harfbuzz 15.1.0
+- harfbuzz 15.2.0
 - libunibreak 8.0.1
 - libass 0.17.5
 
