@@ -20,7 +20,7 @@ Currently FFmpeg 9.1 is built with the following packages enabled for all platfo
 - vpx 1.17.0
 - webp 1.6.0
 - libvmaf 3.2.1
-- x264 b35605ace3ddf7c1a5d67a2eb553f034aef41d55 (except armv7l)
+- x264 0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee (except armv7l)
 - x265 4.3
 - freetype 2.15.0
 - fribidi 1.0.18
