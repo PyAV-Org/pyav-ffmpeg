@@ -34,6 +34,12 @@ gnutls_group = [
         sha256="5b0ecd46cbf225375f20ab4056197e66a7ac590e2684c069af407ae3383c9d81",
     ),
     Package(
+        name="libtasn1",
+        source_url="https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.21.0.tar.gz",
+        sha256="1d8a444a223cc5464240777346e125de51d8e6abf0b8bac742ac84609167dc87",
+        build_arguments=["--disable-doc"],
+    ),
+    Package(
         name="nettle",
         source_url="https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz",
         sha256="3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094",
@@ -44,7 +50,7 @@ gnutls_group = [
         name="gnutls",
         source_url="https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz",
         sha256="7e2d258071f5db9620aa7ff34259331d004f7beafa3eb18560cfaf60acfbf02a",
-        requires=["nettle", "unistring"],
+        requires=["libtasn1", "nettle", "unistring"],
         build_arguments=[
             "--disable-cxx",
             "--disable-doc",
@@ -53,7 +59,6 @@ gnutls_group = [
             "--disable-nls",
             "--disable-tests",
             "--disable-tools",
-            "--with-included-libtasn1",
             "--without-p11-kit",
         ],
     ),
