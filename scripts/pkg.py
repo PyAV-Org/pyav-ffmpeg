@@ -226,8 +226,8 @@ alsa_package = Package(
 
 nvheaders_package = Package(
     name="nv-codec-headers",
-    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.1.15.0.tar.gz",
-    sha256="2255bc74d038b95aa4be30f5f66322c2176acbdb90ada1851db6993536fbeaf7",
+    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.1.tar.gz",
+    sha256="c293161bd92dac53f2f8fab08abcd4f96773c3644a57b23c2260b4be2311ab2f",
     build_system="make",
 )
 
